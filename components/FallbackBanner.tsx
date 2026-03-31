@@ -19,7 +19,7 @@ export default function FallbackBanner() {
       <p className="text-xs flex-1" style={{ color: '#fcd34d' }}>
         AI unavailable — showing template response. Edit before sending.
       </p>
-      <button onClick={() => setDismissed(true)} style={{ color: '#718096' }}>
+      <button onClick={() => setDismissed(true)} style={{ color: '#6B7280' }}>
         <X size={13} />
       </button>
     </div>

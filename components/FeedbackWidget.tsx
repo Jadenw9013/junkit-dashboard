@@ -28,7 +28,7 @@ export default function FeedbackWidget({ tool, outputSummary }: FeedbackWidgetPr
 
   if (state === 'done') {
     return (
-      <p className="text-xs text-center py-1" style={{ color: '#718096' }}>
+      <p className="text-xs text-center py-1" style={{ color: '#6B7280' }}>
         Thanks for the feedback
       </p>
     )
@@ -38,7 +38,7 @@ export default function FeedbackWidget({ tool, outputSummary }: FeedbackWidgetPr
     <div className="text-center">
       {state === 'idle' && (
         <div className="flex items-center justify-center gap-3">
-          <span className="text-xs" style={{ color: '#718096' }}>
+          <span className="text-xs" style={{ color: '#6B7280' }}>
             Was this helpful?
           </span>
           <button
@@ -69,16 +69,16 @@ export default function FeedbackWidget({ tool, outputSummary }: FeedbackWidgetPr
             onChange={(e) => setIssue(e.target.value)}
             className="w-full px-3 py-2 rounded-lg text-xs outline-none"
             style={{
-              backgroundColor: '#1a2535',
-              border: '1px solid rgba(184,150,74,0.2)',
-              color: '#f5f0e8',
+              backgroundColor: '#F7F6F1',
+              border: '1px solid rgba(0,0,0,0.2)',
+              color: '#2D2D2D',
             }}
           />
           <button
             onClick={handleBadSubmit}
             disabled={submitting}
             className="text-xs py-1.5 rounded-lg disabled:opacity-50"
-            style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#b8964a' }}
+            style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#F5C518' }}
           >
             Submit
           </button>

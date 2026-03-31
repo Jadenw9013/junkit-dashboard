@@ -35,7 +35,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#1a2535',
+  themeColor: '#F7F6F1',
 }
 
 export default function RootLayout({
@@ -48,7 +48,7 @@ export default function RootLayout({
       lang="en"
       className={`${barlowCondensed.variable} ${barlow.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col" style={{ backgroundColor: '#1a2535', color: '#f5f0e8' }}>
+      <body className="min-h-full flex flex-col" style={{ backgroundColor: '#F7F6F1', color: '#2D2D2D' }}>
         {children}
         <Toaster richColors position="top-center" />
       </body>

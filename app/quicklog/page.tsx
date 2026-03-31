@@ -8,9 +8,9 @@ import { ServiceType } from '@/lib/types'
 import BackButton from '@/components/BackButton'
 
 const inputStyle = {
-  backgroundColor: '#243044',
-  border: '1px solid rgba(184,150,74,0.3)',
-  color: '#f5f0e8',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid rgba(0,0,0,0.3)',
+  color: '#2D2D2D',
 }
 
 export default function QuickLogPage() {
@@ -32,13 +32,13 @@ export default function QuickLogPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F6F1' }}>
       <div className="mx-auto max-w-[430px] px-4 pb-8">
         <div className="flex items-center gap-3 py-5">
           <BackButton href="/" />
           <div>
-            <h1 className="text-xl font-bold" style={{ color: '#f5f0e8' }}>Quick Log</h1>
-            <p className="text-xs" style={{ color: '#718096' }}>Fast capture — no AI, just log it</p>
+            <h1 className="text-xl font-bold" style={{ color: '#2D2D2D' }}>Quick Log</h1>
+            <p className="text-xs" style={{ color: '#6B7280' }}>Fast capture — no AI, just log it</p>
           </div>
         </div>
 
@@ -46,7 +46,7 @@ export default function QuickLogPage() {
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <CheckCircle size={48} style={{ color: '#4ade80' }} />
             <p className="text-lg font-semibold" style={{ color: '#4ade80' }}>Logged ✓</p>
-            <p className="text-sm" style={{ color: '#718096' }}>Returning to dashboard…</p>
+            <p className="text-sm" style={{ color: '#6B7280' }}>Returning to dashboard…</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -66,7 +66,7 @@ export default function QuickLogPage() {
 
             <button onClick={handleLog} disabled={loading || !form.customerName.trim()}
               className="w-full py-4 rounded-xl font-bold text-base transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
-              style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
+              style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>
               <Zap size={18} />
               {loading ? 'Logging...' : 'Log It'}
             </button>

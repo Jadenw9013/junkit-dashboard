@@ -11,7 +11,7 @@ export default function BackButton({ href, label = 'Back' }: BackButtonProps) {
     <Link
       href={href}
       className="inline-flex items-center gap-1.5 text-sm transition-opacity hover:opacity-80"
-      style={{ color: '#718096' }}
+      style={{ color: '#6B7280' }}
     >
       <ArrowLeft size={16} />
       <span>{label}</span>

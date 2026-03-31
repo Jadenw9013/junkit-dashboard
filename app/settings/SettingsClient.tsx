@@ -11,20 +11,20 @@ import { Settings, PricingItem, SettingsSnapshot } from '@/lib/types'
 import BackButton from '@/components/BackButton'
 
 const inputStyle = {
-  backgroundColor: '#1a2535',
-  border: '1px solid rgba(184,150,74,0.3)',
-  color: '#f5f0e8',
+  backgroundColor: '#F7F6F1',
+  border: '1px solid rgba(0,0,0,0.3)',
+  color: '#2D2D2D',
 }
 
 const cardStyle = {
-  backgroundColor: '#243044',
-  border: '1px solid rgba(184,150,74,0.2)',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid rgba(0,0,0,0.2)',
 }
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl p-4" style={cardStyle}>
-      <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: '#b8964a' }}>{title}</h2>
+      <h2 className="text-sm font-semibold uppercase tracking-wider mb-4" style={{ color: '#F5C518' }}>{title}</h2>
       {children}
     </div>
   )
@@ -34,7 +34,7 @@ function SaveButton({ onClick, loading, label = 'Save' }: { onClick: () => void;
   return (
     <button onClick={onClick} disabled={loading}
       className="w-full mt-4 py-3 rounded-xl font-semibold text-sm disabled:opacity-50 transition-opacity"
-      style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
+      style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>
       {loading ? 'Saving...' : label}
     </button>
   )
@@ -43,8 +43,8 @@ function SaveButton({ onClick, loading, label = 'Save' }: { onClick: () => void;
 function FieldLabel({ children, helper }: { children: React.ReactNode; helper?: string }) {
   return (
     <div className="mb-1">
-      <label className="text-sm font-medium" style={{ color: '#f5f0e8' }}>{children}</label>
-      {helper && <p className="text-xs mt-0.5" style={{ color: '#718096' }}>{helper}</p>}
+      <label className="text-sm font-medium" style={{ color: '#2D2D2D' }}>{children}</label>
+      {helper && <p className="text-xs mt-0.5" style={{ color: '#6B7280' }}>{helper}</p>}
     </div>
   )
 }
@@ -56,9 +56,9 @@ function ButtonGroup<T extends string>({ options, value, onChange }: { options: 
         <button key={opt.value} onClick={() => onChange(opt.value)}
           className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
           style={{
-            backgroundColor: value === opt.value ? '#b8964a' : '#1a2535',
-            color: value === opt.value ? '#1a2535' : '#718096',
-            border: value === opt.value ? '1px solid #b8964a' : '1px solid rgba(184,150,74,0.2)',
+            backgroundColor: value === opt.value ? '#F5C518' : '#F7F6F1',
+            color: value === opt.value ? '#F7F6F1' : '#6B7280',
+            border: value === opt.value ? '1px solid #F5C518' : '1px solid rgba(0,0,0,0.2)',
           }}>
           {opt.label}
         </button>
@@ -214,14 +214,14 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
   const dayLabels: Record<string, string> = { monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu', friday: 'Fri', saturday: 'Sat', sunday: 'Sun' }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F6F1' }}>
       <div className="mx-auto max-w-[430px] px-4 pb-10">
         <div className="flex items-center gap-3 py-5">
           <BackButton href="/" label="Back to Dashboard" />
         </div>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold" style={{ color: '#f5f0e8' }}>Business Settings</h1>
-          <p className="text-xs mt-1" style={{ color: '#718096' }}>Changes take effect immediately on all AI responses.</p>
+          <h1 className="text-2xl font-bold" style={{ color: '#2D2D2D' }}>Business Settings</h1>
+          <p className="text-xs mt-1" style={{ color: '#6B7280' }}>Changes take effect immediately on all AI responses.</p>
         </div>
 
         <div className="space-y-4">
@@ -264,10 +264,10 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
             </div>
 
             {/* Live preview */}
-            <div className="rounded-lg p-3 mb-3" style={{ backgroundColor: '#1a2535', border: '1px solid rgba(184,150,74,0.15)' }}>
-              <p className="text-xs font-medium mb-1.5" style={{ color: '#718096' }}>Preview:</p>
+            <div className="rounded-lg p-3 mb-3" style={{ backgroundColor: '#F7F6F1', border: '1px solid rgba(0,0,0,0.15)' }}>
+              <p className="text-xs font-medium mb-1.5" style={{ color: '#6B7280' }}>Preview:</p>
               {pricing.slice(0, 4).map((p) => (
-                <p key={p.id} className="text-xs" style={{ color: '#d4ae6a' }}>
+                <p key={p.id} className="text-xs" style={{ color: '#E0B115' }}>
                   {p.label}: ${p.min}–${p.max}{p.notes ? ` (${p.notes})` : ''}
                 </p>
               ))}
@@ -275,7 +275,7 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
 
             {!showAddPrice ? (
               <button onClick={() => setShowAddPrice(true)} className="flex items-center gap-1.5 text-xs py-2 px-3 rounded-lg w-full justify-center"
-                style={{ backgroundColor: 'rgba(184,150,74,0.08)', border: '1px dashed rgba(184,150,74,0.3)', color: '#b8964a' }}>
+                style={{ backgroundColor: 'rgba(0,0,0,0.08)', border: '1px dashed rgba(0,0,0,0.3)', color: '#F5C518' }}>
                 <Plus size={13} /> Add custom item
               </button>
             ) : (
@@ -288,7 +288,7 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
                   className="px-2 py-1.5 rounded-lg text-xs outline-none text-center" style={inputStyle} />
                 <input type="text" placeholder="Notes" value={newPriceRow.notes} onChange={(e) => setNewPriceRow({ ...newPriceRow, notes: e.target.value })}
                   className="px-2 py-1.5 rounded-lg text-xs outline-none" style={inputStyle} />
-                <button onClick={addPriceRow} className="col-span-4 text-xs py-1.5 rounded-lg font-medium" style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>Add</button>
+                <button onClick={addPriceRow} className="col-span-4 text-xs py-1.5 rounded-lg font-medium" style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>Add</button>
               </div>
             )}
             <SaveButton onClick={handleSavePricing} loading={!!loading.pricing} label="Save Pricing" />
@@ -304,9 +304,9 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
             <div className="flex flex-wrap gap-2 mb-3">
               {cities.map((city) => (
                 <span key={city} className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-full"
-                  style={{ backgroundColor: 'rgba(184,150,74,0.12)', border: '1px solid rgba(184,150,74,0.25)', color: '#d4ae6a' }}>
+                  style={{ backgroundColor: 'rgba(0,0,0,0.12)', border: '1px solid rgba(0,0,0,0.25)', color: '#E0B115' }}>
                   {city}
-                  <button onClick={() => setCities(cities.filter((c) => c !== city))} style={{ color: '#718096' }}><X size={11} /></button>
+                  <button onClick={() => setCities(cities.filter((c) => c !== city))} style={{ color: '#6B7280' }}><X size={11} /></button>
                 </span>
               ))}
             </div>
@@ -314,7 +314,7 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
               <input type="text" placeholder="Add city" value={newCity} onChange={(e) => setNewCity(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addCity()}
                 className="flex-1 px-3 py-2 rounded-lg text-sm outline-none" style={inputStyle} />
-              <button onClick={addCity} className="px-4 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: 'rgba(184,150,74,0.15)', color: '#b8964a' }}>
+              <button onClick={addCity} className="px-4 py-2 rounded-lg text-sm font-medium" style={{ backgroundColor: 'rgba(0,0,0,0.15)', color: '#F5C518' }}>
                 Add
               </button>
             </div>
@@ -331,10 +331,10 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
                   {accepted.map((item) => (
                     <div key={item} className="flex items-center justify-between gap-1 text-xs px-2 py-1.5 rounded-lg"
                       style={{ backgroundColor: 'rgba(74,222,128,0.08)', border: '1px solid rgba(74,222,128,0.15)' }}>
-                      <span style={{ color: '#f5f0e8' }} className="truncate">{item}</span>
+                      <span style={{ color: '#2D2D2D' }} className="truncate">{item}</span>
                       <div className="flex gap-1 shrink-0">
-                        <button onClick={() => moveToRefused(item)} title="Move to refused" style={{ color: '#718096' }}><ArrowLeftRight size={10} /></button>
-                        <button onClick={() => setAccepted(accepted.filter((i) => i !== item))} style={{ color: '#718096' }}><X size={10} /></button>
+                        <button onClick={() => moveToRefused(item)} title="Move to refused" style={{ color: '#6B7280' }}><ArrowLeftRight size={10} /></button>
+                        <button onClick={() => setAccepted(accepted.filter((i) => i !== item))} style={{ color: '#6B7280' }}><X size={10} /></button>
                       </div>
                     </div>
                   ))}
@@ -354,10 +354,10 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
                   {refused.map((item) => (
                     <div key={item} className="flex items-center justify-between gap-1 text-xs px-2 py-1.5 rounded-lg"
                       style={{ backgroundColor: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.15)' }}>
-                      <span style={{ color: '#f5f0e8' }} className="truncate">{item}</span>
+                      <span style={{ color: '#2D2D2D' }} className="truncate">{item}</span>
                       <div className="flex gap-1 shrink-0">
-                        <button onClick={() => moveToAccepted(item)} title="Move to accepted" style={{ color: '#718096' }}><ArrowLeftRight size={10} /></button>
-                        <button onClick={() => setRefused(refused.filter((i) => i !== item))} style={{ color: '#718096' }}><X size={10} /></button>
+                        <button onClick={() => moveToAccepted(item)} title="Move to accepted" style={{ color: '#6B7280' }}><ArrowLeftRight size={10} /></button>
+                        <button onClick={() => setRefused(refused.filter((i) => i !== item))} style={{ color: '#6B7280' }}><X size={10} /></button>
                       </div>
                     </div>
                   ))}
@@ -380,9 +380,9 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
                 <button key={day} onClick={() => setAvail({ ...avail, [day]: !avail[day] })}
                   className="px-3 py-2 rounded-lg text-xs font-semibold transition-all"
                   style={{
-                    backgroundColor: avail[day] ? '#b8964a' : '#1a2535',
-                    color: avail[day] ? '#1a2535' : '#718096',
-                    border: avail[day] ? '1px solid #b8964a' : '1px solid rgba(184,150,74,0.2)',
+                    backgroundColor: avail[day] ? '#F5C518' : '#F7F6F1',
+                    color: avail[day] ? '#F7F6F1' : '#6B7280',
+                    border: avail[day] ? '1px solid #F5C518' : '1px solid rgba(0,0,0,0.2)',
                   }}>
                   {dayLabels[day]}
                 </button>
@@ -424,26 +424,26 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
           <div className="rounded-xl overflow-hidden" style={cardStyle}>
             <button onClick={() => setHistoryOpen(!historyOpen)}
               className="w-full flex items-center justify-between px-4 py-3 text-left"
-              style={{ color: '#f5f0e8' }}>
-              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#b8964a' }}>Version History</span>
-              {historyOpen ? <ChevronUp size={16} style={{ color: '#718096' }} /> : <ChevronDown size={16} style={{ color: '#718096' }} />}
+              style={{ color: '#2D2D2D' }}>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ color: '#F5C518' }}>Version History</span>
+              {historyOpen ? <ChevronUp size={16} style={{ color: '#6B7280' }} /> : <ChevronDown size={16} style={{ color: '#6B7280' }} />}
             </button>
 
             {historyOpen && (
               <div className="px-4 pb-4">
                 {history.length === 0 ? (
-                  <p className="text-xs text-center py-4" style={{ color: '#718096' }}>No history yet — save any setting to start tracking</p>
+                  <p className="text-xs text-center py-4" style={{ color: '#6B7280' }}>No history yet — save any setting to start tracking</p>
                 ) : (
                   <div className="space-y-2">
                     {history.map((snap, idx) => (
-                      <div key={idx} className="flex items-center justify-between py-2 border-t" style={{ borderColor: 'rgba(184,150,74,0.1)' }}>
+                      <div key={idx} className="flex items-center justify-between py-2 border-t" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
                         <div>
-                          <p className="text-xs font-medium" style={{ color: '#f5f0e8' }}>Version {snap.settings.version}</p>
-                          <p className="text-xs" style={{ color: '#718096' }}>{new Date(snap.savedAt).toLocaleString()}</p>
+                          <p className="text-xs font-medium" style={{ color: '#2D2D2D' }}>Version {snap.settings.version}</p>
+                          <p className="text-xs" style={{ color: '#6B7280' }}>{new Date(snap.savedAt).toLocaleString()}</p>
                         </div>
                         <button onClick={() => setRestoreConfirm(snap)}
                           className="text-xs px-3 py-1.5 rounded-lg"
-                          style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#b8964a', border: '1px solid rgba(184,150,74,0.2)' }}>
+                          style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#F5C518', border: '1px solid rgba(0,0,0,0.2)' }}>
                           Restore
                         </button>
                       </div>
@@ -457,7 +457,7 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
 
         {/* Redo wizard */}
         <div className="text-center mt-6 mb-4">
-          <a href="/onboarding" className="text-xs underline" style={{ color: '#718096' }}>
+          <a href="/onboarding" className="text-xs underline" style={{ color: '#6B7280' }}>
             Want to redo the initial setup? Run wizard again →
           </a>
         </div>
@@ -466,19 +466,19 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
       {/* Restore Confirmation Dialog */}
       {restoreConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
-          <div className="mx-4 w-full max-w-sm rounded-xl p-6" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.3)' }}>
-            <h3 className="font-semibold mb-2" style={{ color: '#f5f0e8' }}>Restore this version?</h3>
-            <p className="text-sm mb-5" style={{ color: '#718096' }}>
+          <div className="mx-4 w-full max-w-sm rounded-xl p-6" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.3)' }}>
+            <h3 className="font-semibold mb-2" style={{ color: '#2D2D2D' }}>Restore this version?</h3>
+            <p className="text-sm mb-5" style={{ color: '#6B7280' }}>
               This will replace your current settings with version {restoreConfirm.settings.version} from {new Date(restoreConfirm.savedAt).toLocaleString()}. This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button onClick={() => handleRestore(restoreConfirm)} disabled={!!loading.restore}
                 className="flex-1 py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
-                style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
+                style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>
                 {loading.restore ? 'Restoring...' : 'Yes, restore'}
               </button>
               <button onClick={() => setRestoreConfirm(null)} className="flex-1 py-3 rounded-xl text-sm"
-                style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#718096', border: '1px solid rgba(184,150,74,0.2)' }}>
+                style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#6B7280', border: '1px solid rgba(0,0,0,0.2)' }}>
                 Cancel
               </button>
             </div>

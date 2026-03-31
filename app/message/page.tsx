@@ -13,9 +13,9 @@ import { Suspense } from 'react'
 type Tab = 're-engagement' | 'follow-up' | 'custom'
 
 const inputStyle = {
-  backgroundColor: '#243044',
-  border: '1px solid rgba(184,150,74,0.3)',
-  color: '#f5f0e8',
+  backgroundColor: '#FFFFFF',
+  border: '1px solid rgba(0,0,0,0.3)',
+  color: '#2D2D2D',
 }
 
 function MessagePageInner() {
@@ -72,19 +72,19 @@ function MessagePageInner() {
   ]
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F6F1' }}>
       <div className="mx-auto max-w-[430px] px-4 pb-8">
         <div className="flex items-center gap-3 py-5">
           <BackButton href="/" />
-          <h1 className="text-xl font-bold" style={{ color: '#f5f0e8' }}>Send a Message</h1>
+          <h1 className="text-xl font-bold" style={{ color: '#2D2D2D' }}>Send a Message</h1>
         </div>
 
         {/* Tabs */}
-        <div className="flex rounded-xl p-1 mb-5" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.2)' }}>
+        <div className="flex rounded-xl p-1 mb-5" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.2)' }}>
           {tabs.map((tab) => (
             <button key={tab.id} onClick={() => { setActiveTab(tab.id); setResult(null) }}
               className="flex-1 py-2 rounded-lg text-xs font-semibold transition-all"
-              style={{ backgroundColor: activeTab === tab.id ? '#b8964a' : 'transparent', color: activeTab === tab.id ? '#1a2535' : '#718096' }}>
+              style={{ backgroundColor: activeTab === tab.id ? '#F5C518' : 'transparent', color: activeTab === tab.id ? '#F7F6F1' : '#6B7280' }}>
               {tab.label}
             </button>
           ))}
@@ -140,22 +140,22 @@ function MessagePageInner() {
 
         <button onClick={handleGenerate} disabled={loading || !canGenerate}
           className="w-full mt-4 py-3 rounded-xl font-semibold text-sm transition-opacity disabled:opacity-50"
-          style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
+          style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>
           {loading ? 'Generating...' : 'Generate Message'}
         </button>
 
         {result && (
           <div className="mt-4 space-y-3">
             {result.usedFallback && <FallbackBanner />}
-            <div className="rounded-xl p-4" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.4)' }}>
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.4)' }}>
               <div className="flex items-start justify-between gap-2">
-                <p className="text-sm leading-relaxed flex-1" style={{ color: '#f5f0e8' }}>{result.text}</p>
+                <p className="text-sm leading-relaxed flex-1" style={{ color: '#2D2D2D' }}>{result.text}</p>
                 <button onClick={async () => { await navigator.clipboard.writeText(result.text); setCopied(true); setTimeout(() => setCopied(false), 2000) }}
-                  className="p-1.5 rounded-lg shrink-0" style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#b8964a' }}>
+                  className="p-1.5 rounded-lg shrink-0" style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#F5C518' }}>
                   {copied ? <Check size={14} /> : <Copy size={14} />}
                 </button>
               </div>
-              <p className="text-xs mt-2" style={{ color: '#718096' }}>{result.text.length} characters</p>
+              <p className="text-xs mt-2" style={{ color: '#6B7280' }}>{result.text.length} characters</p>
             </div>
             <FeedbackWidget tool="message" outputSummary={result.text.slice(0, 100)} />
           </div>
@@ -167,7 +167,7 @@ function MessagePageInner() {
 
 export default function MessagePage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1a2535' }}><p style={{ color: '#718096' }}>Loading...</p></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F7F6F1' }}><p style={{ color: '#6B7280' }}>Loading...</p></div>}>
       <MessagePageInner />
     </Suspense>
   )

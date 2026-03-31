@@ -19,7 +19,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
   lead: { bg: 'rgba(96,165,250,0.15)', text: '#60a5fa' },
   quoted: { bg: 'rgba(251,191,36,0.15)', text: '#fbbf24' },
   completed: { bg: 'rgba(74,222,128,0.15)', text: '#4ade80' },
-  reviewed: { bg: 'rgba(184,150,74,0.15)', text: '#b8964a' },
+  reviewed: { bg: 'rgba(0,0,0,0.15)', text: '#F5C518' },
 }
 
 export default function CustomerDetailClient({ customer, jobs }: { customer: Customer; jobs: Job[] }) {
@@ -71,34 +71,34 @@ export default function CustomerDetailClient({ customer, jobs }: { customer: Cus
   const reEngageUrl = `/message?tab=reengagement&name=${encodeURIComponent(customer.name)}&service=${encodeURIComponent(customer.lastJobService)}&months=${monthsBucket}`
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F7F6F1' }}>
       <div className="mx-auto max-w-[430px] px-4 pb-8">
         <div className="flex items-center gap-3 py-5">
           <BackButton href="/customers" />
-          <h1 className="text-xl font-bold" style={{ color: '#f5f0e8' }}>{customer.name}</h1>
+          <h1 className="text-xl font-bold" style={{ color: '#2D2D2D' }}>{customer.name}</h1>
         </div>
 
         {/* Header Card */}
-        <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.3)' }}>
-          <p className="text-sm" style={{ color: '#718096' }}>{customer.phone} · {customer.city}</p>
+        <div className="rounded-xl p-4 mb-4" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.3)' }}>
+          <p className="text-sm" style={{ color: '#6B7280' }}>{customer.phone} · {customer.city}</p>
           <div className="grid grid-cols-3 gap-2 mt-3">
-            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#1a2535' }}>
-              <p className="text-lg font-bold" style={{ color: '#b8964a' }}>{customer.totalJobs}</p>
-              <p className="text-xs" style={{ color: '#718096' }}>Total Jobs</p>
+            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#F7F6F1' }}>
+              <p className="text-lg font-bold" style={{ color: '#F5C518' }}>{customer.totalJobs}</p>
+              <p className="text-xs" style={{ color: '#6B7280' }}>Total Jobs</p>
             </div>
-            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#1a2535' }}>
+            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#F7F6F1' }}>
               <p className="text-lg font-bold" style={{ color: '#4ade80' }}>${customer.totalRevenue.toLocaleString()}</p>
-              <p className="text-xs" style={{ color: '#718096' }}>Revenue</p>
+              <p className="text-xs" style={{ color: '#6B7280' }}>Revenue</p>
             </div>
-            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#1a2535' }}>
-              <p className="text-xs font-bold" style={{ color: '#d4ae6a' }}>{memberSince}</p>
-              <p className="text-xs" style={{ color: '#718096' }}>Member Since</p>
+            <div className="rounded-lg p-2.5 text-center" style={{ backgroundColor: '#F7F6F1' }}>
+              <p className="text-xs font-bold" style={{ color: '#E0B115' }}>{memberSince}</p>
+              <p className="text-xs" style={{ color: '#6B7280' }}>Member Since</p>
             </div>
           </div>
 
           {/* Tags */}
           <div className="mt-4">
-            <p className="text-xs font-semibold mb-2" style={{ color: '#718096' }}>Tags</p>
+            <p className="text-xs font-semibold mb-2" style={{ color: '#6B7280' }}>Tags</p>
             <div className="flex flex-wrap gap-1.5">
               {tags.map((t) => (
                 <span key={t} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-full"
@@ -115,16 +115,16 @@ export default function CustomerDetailClient({ customer, jobs }: { customer: Cus
                   onChange={(e) => setNewTag(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && addTag()}
                   className="w-20 px-2 py-1 rounded-lg text-xs outline-none"
-                  style={{ backgroundColor: '#1a2535', border: '1px solid rgba(184,150,74,0.2)', color: '#f5f0e8' }}
+                  style={{ backgroundColor: '#F7F6F1', border: '1px solid rgba(0,0,0,0.2)', color: '#2D2D2D' }}
                 />
-                <button onClick={addTag} className="p-1 rounded" style={{ color: '#b8964a' }}><Plus size={12} /></button>
+                <button onClick={addTag} className="p-1 rounded" style={{ color: '#F5C518' }}><Plus size={12} /></button>
               </div>
             </div>
           </div>
 
           {/* Notes */}
           <div className="mt-4">
-            <p className="text-xs font-semibold mb-2" style={{ color: '#718096' }}>Private Notes</p>
+            <p className="text-xs font-semibold mb-2" style={{ color: '#6B7280' }}>Private Notes</p>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -132,30 +132,30 @@ export default function CustomerDetailClient({ customer, jobs }: { customer: Cus
               placeholder="Add notes about this customer..."
               rows={3}
               className="w-full rounded-lg p-3 text-sm resize-none outline-none"
-              style={{ backgroundColor: '#1a2535', border: '1px solid rgba(184,150,74,0.2)', color: '#f5f0e8' }}
+              style={{ backgroundColor: '#F7F6F1', border: '1px solid rgba(0,0,0,0.2)', color: '#2D2D2D' }}
             />
-            {saving && <p className="text-xs mt-1" style={{ color: '#718096' }}>Saving...</p>}
+            {saving && <p className="text-xs mt-1" style={{ color: '#6B7280' }}>Saving...</p>}
           </div>
         </div>
 
         {/* Job History */}
-        <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: '#718096' }}>
+        <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: '#6B7280' }}>
           Job History
         </h2>
         {sortedJobs.length === 0 ? (
-          <p className="text-sm text-center py-6" style={{ color: '#718096' }}>No jobs found.</p>
+          <p className="text-sm text-center py-6" style={{ color: '#6B7280' }}>No jobs found.</p>
         ) : (
           <div className="space-y-2 mb-6">
             {sortedJobs.map((j) => {
               const sc = statusColors[j.status] || statusColors.lead
               return (
-                <div key={j.id} className="rounded-xl p-3" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
+                <div key={j.id} className="rounded-xl p-3" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.15)' }}>
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium" style={{ color: '#f5f0e8' }}>
+                      <p className="text-sm font-medium" style={{ color: '#2D2D2D' }}>
                         {serviceLabels[j.service] || j.service}
                       </p>
-                      <p className="text-xs" style={{ color: '#718096' }}>
+                      <p className="text-xs" style={{ color: '#6B7280' }}>
                         {new Date(j.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} · {j.city}
                       </p>
                     </div>
@@ -177,7 +177,7 @@ export default function CustomerDetailClient({ customer, jobs }: { customer: Cus
         {/* Re-engage Button */}
         <Link href={reEngageUrl}
           className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-sm transition-opacity active:opacity-80"
-          style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.3)', color: '#b8964a' }}>
+          style={{ backgroundColor: 'rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.3)', color: '#F5C518' }}>
           <RotateCcw size={16} />
           Re-engage Customer
         </Link>

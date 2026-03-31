@@ -42,26 +42,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1a2535' }}>
-      <div className="w-full max-w-sm mx-4 rounded-xl p-8" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.3)' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F7F6F1' }}>
+      <div className="w-full max-w-sm mx-4 rounded-xl p-8" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.08)', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-black tracking-wider mb-1" style={{ color: '#b8964a', fontFamily: 'var(--font-barlow-condensed, sans-serif)' }}>
-            JUNK IT
+          <h1 className="text-4xl font-black tracking-wider mb-1" style={{ color: '#2D2D2D', fontFamily: 'var(--font-barlow-condensed, sans-serif)' }}>
+            JUNK<span style={{ color: '#F5C518' }}>▲</span>IT
           </h1>
-          <p className="text-sm" style={{ color: '#718096' }}>Owner Dashboard</p>
+          <p className="text-sm" style={{ color: '#6B7280' }}>Owner Dashboard</p>
         </div>
 
         {lockoutMsg && (
-          <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl mb-4" style={{ backgroundColor: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)' }}>
-            <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#fcd34d' }} />
-            <p className="text-xs" style={{ color: '#fcd34d' }}>{lockoutMsg}</p>
+          <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl mb-4" style={{ backgroundColor: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)' }}>
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#f59e0b' }} />
+            <p className="text-xs" style={{ color: '#92400e' }}>{lockoutMsg}</p>
           </div>
         )}
 
         {attemptsRemaining !== null && attemptsRemaining <= 2 && !lockoutMsg && (
           <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl mb-4" style={{ backgroundColor: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.25)' }}>
-            <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#fcd34d' }} />
-            <p className="text-xs" style={{ color: '#fcd34d' }}>
+            <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#f59e0b' }} />
+            <p className="text-xs" style={{ color: '#92400e' }}>
               Warning: {attemptsRemaining} attempt{attemptsRemaining !== 1 ? 's' : ''} remaining before lockout
             </p>
           </div>
@@ -74,15 +74,15 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
             className="w-full px-4 py-3 rounded-lg text-base outline-none"
-            style={{ backgroundColor: '#1a2535', border: '1px solid rgba(184,150,74,0.3)', color: '#f5f0e8' }}
+            style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.12)', color: '#2D2D2D' }}
             autoFocus
           />
           {error && !lockoutMsg && (
-            <p className="text-sm text-red-400 text-center">{error}</p>
+            <p className="text-sm text-red-500 text-center">{error}</p>
           )}
           <button type="submit" disabled={loading || !!lockoutMsg}
             className="w-full py-3 rounded-lg font-semibold text-base transition-opacity disabled:opacity-50"
-            style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
+            style={{ backgroundColor: '#F5C518', color: '#2D2D2D' }}>
             {loading ? 'Checking...' : 'Enter'}
           </button>
         </form>
