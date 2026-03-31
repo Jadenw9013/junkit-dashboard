@@ -1,65 +1,105 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { readJobs, getUnreadLeadCount } from '@/lib/jobs'
+import { getTodayAuditCount } from '@/lib/audit'
+import { Job } from '@/lib/types'
+import { MessageSquare, ClipboardList, CheckCircle, Send, Settings, Zap } from 'lucide-react'
+import LogoutButton from '@/components/LogoutButton'
+import JobPipeline from '@/components/JobPipeline'
 
-export default function Home() {
+const DAILY_LIMIT = 50
+
+export default async function HomePage() {
+  const [allJobs, unreadCount, todayUsage] = await Promise.all([
+    readJobs(),
+    getUnreadLeadCount(),
+    getTodayAuditCount(),
+  ])
+
+  const usagePct = Math.min(100, (todayUsage / DAILY_LIMIT) * 100)
+  const usageColor = todayUsage >= DAILY_LIMIT ? '#f87171' : todayUsage >= 40 ? '#fcd34d' : '#b8964a'
+  const usageLabel = todayUsage >= DAILY_LIMIT ? 'Daily limit reached' : todayUsage >= 40 ? 'Nearing daily limit' : `${todayUsage} API calls today`
+
+  const tools = [
+    { href: '/lead', label: 'New Lead', subtitle: 'Draft a response', Icon: MessageSquare, accent: '#b8964a', badge: unreadCount > 0 ? unreadCount : null },
+    { href: '/scope', label: 'Scope a Job', subtitle: 'Get a quote', Icon: ClipboardList, accent: '#b8964a', badge: null },
+    { href: '/jobdone', label: 'Job Done', subtitle: 'Log & request review', Icon: CheckCircle, accent: '#4ade80', badge: null },
+    { href: '/message', label: 'Send a Message', subtitle: 'Re-engage customers', Icon: Send, accent: '#60a5fa', badge: null },
+  ]
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
+      <div className="mx-auto max-w-[430px] px-4 pb-8">
+        {/* Header */}
+        <div className="flex items-center justify-between py-5">
+          <div>
+            <h1 className="text-3xl font-black tracking-widest leading-none" style={{ color: '#b8964a', fontFamily: 'var(--font-barlow-condensed, sans-serif)' }}>
+              JUNK IT
+            </h1>
+            <p className="text-xs mt-0.5" style={{ color: '#718096' }}>Owner Dashboard</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href="/settings" className="p-2 rounded-lg transition-opacity hover:opacity-80" style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.25)', color: '#718096' }}>
+              <Settings size={17} />
+            </Link>
+            <LogoutButton />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Tool Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          {tools.map(({ href, label, subtitle, Icon, accent, badge }) => (
+            <Link key={href} href={href}
+              className="flex flex-col items-start p-4 rounded-xl transition-all active:opacity-80 relative"
+              style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.35)' }}>
+              {badge !== null && badge > 0 && (
+                <span className="absolute top-2 right-2 text-xs px-1.5 py-0.5 rounded-full font-bold"
+                  style={{ backgroundColor: '#b8964a', color: '#1a2535', minWidth: '18px', textAlign: 'center' }}>
+                  {badge}
+                </span>
+              )}
+              <Icon size={26} style={{ color: accent }} className="mb-3" />
+              <span className="font-semibold text-sm leading-tight" style={{ color: '#f5f0e8' }}>{label}</span>
+              <span className="text-xs mt-0.5" style={{ color: '#718096' }}>{subtitle}</span>
+            </Link>
+          ))}
         </div>
-      </main>
+
+        {/* Quick Log - full width */}
+        <Link href="/quicklog"
+          className="flex items-center gap-3 w-full p-4 rounded-xl mb-5 transition-all active:opacity-80"
+          style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.25)' }}>
+          <Zap size={20} style={{ color: '#fcd34d' }} />
+          <div>
+            <span className="font-semibold text-sm" style={{ color: '#f5f0e8' }}>Quick Log</span>
+            <p className="text-xs" style={{ color: '#718096' }}>Fast job capture, no AI</p>
+          </div>
+        </Link>
+
+        {/* Usage Indicator */}
+        <div className="mb-6 rounded-xl p-3" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs" style={{ color: '#718096' }}>Today&apos;s usage</span>
+            <span className="text-xs font-medium" style={{ color: usageColor }}>{usageLabel}</span>
+          </div>
+          <div className="w-full h-1.5 rounded-full" style={{ backgroundColor: '#1a2535' }}>
+            <div className="h-full rounded-full transition-all" style={{ width: `${usagePct}%`, backgroundColor: usageColor }} />
+          </div>
+        </div>
+
+        {/* Job Pipeline */}
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: '#718096' }}>
+            Jobs
+          </h2>
+          {allJobs.length === 0 ? (
+            <p className="text-sm text-center py-8" style={{ color: '#718096' }}>
+              No jobs yet — use the tools above to get started
+            </p>
+          ) : (
+            <JobPipeline jobs={allJobs} />
+          )}
+        </div>
+      </div>
     </div>
-  );
+  )
 }

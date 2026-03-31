@@ -1,0 +1,28 @@
+{
+  "businessName": "Junk It",
+  "ownerName": "Owner",
+  "phone": "(425) 000-0000",
+  "googleReviewLink": "https://g.page/r/YOUR_REVIEW_LINK",
+  "pricing": [
+    { "id": "quarter", "label": "Quarter truck load", "min": 100, "max": 150, "notes": "" },
+    { "id": "half", "label": "Half truck load", "min": 200, "max": 280, "notes": "" },
+    { "id": "full", "label": "Full truck load", "min": 380, "max": 480, "notes": "" },
+    { "id": "demo", "label": "Light demolition", "min": 250, "max": 600, "notes": "Scope dependent" },
+    { "id": "trailer", "label": "Trailer rental", "min": 75, "max": 120, "notes": "Per day" },
+    { "id": "appliance", "label": "Appliance surcharge", "min": 40, "max": 60, "notes": "Per item" },
+    { "id": "hottub", "label": "Hot tub surcharge", "min": 75, "max": 150, "notes": "" }
+  ],
+  "serviceArea": ["Bellevue", "Kirkland", "Redmond", "Bothell", "Snohomish", "Woodinville", "Kenmore", "Everett"],
+  "acceptedItems": ["furniture", "appliances", "yard waste", "construction debris", "estate cleanouts", "garage cleanouts", "mattresses", "hot tubs", "electronics"],
+  "refusedItems": ["hazardous materials", "paint", "chemicals", "propane tanks", "tires"],
+  "availability": {
+    "monday": true, "tuesday": true, "wednesday": true,
+    "thursday": true, "friday": true, "saturday": true, "sunday": false
+  },
+  "businessHours": "7am–6pm",
+  "tone": "friendly",
+  "responseLength": "standard",
+  "includePricingInFirstResponse": true,
+  "version": 1,
+  "updatedAt": ""
+}
