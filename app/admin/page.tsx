@@ -216,7 +216,7 @@ export default function AdminDashboard() {
                   <div className="flex justify-between items-center py-1">
                     <span className="text-gray-500 font-medium">Storage Backend</span>
                     <span className={`font-semibold text-sm px-2 py-0.5 rounded ${health.storageBackend === 'kv' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
-                      {health.storageBackend === 'kv' ? 'Upstash Redis (KV)' : 'Local files (dev only)'}
+                      {health.storageBackend === 'kv' ? 'Vercel KV' : 'Local files (dev only)'}
                     </span>
                   </div>
                   {health.storageBackend === 'file' && (

@@ -15,5 +15,22 @@
     "jobs": [
       "ef3a0deb-767e-4673-9de5-b14d4e33643a"
     ]
+  },
+  {
+    "id": "7699bedf-7c47-43fc-b55e-d20477dd2f9d",
+    "createdAt": "2026-03-31T23:19:16.295Z",
+    "updatedAt": "2026-03-31T23:19:16.295Z",
+    "name": "Sarah Johnson",
+    "phone": "425-555-0199",
+    "city": "Kirkland",
+    "totalJobs": 1,
+    "totalRevenue": 0,
+    "lastJobDate": "2026-03-31T23:19:16.295Z",
+    "lastJobService": "junk-removal",
+    "tags": [],
+    "notes": "",
+    "jobs": [
+      "75488f4f-f56d-436d-952a-b59d61bffd15"
+    ]
   }
 ]

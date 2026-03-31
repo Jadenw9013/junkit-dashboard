@@ -9,5 +9,16 @@
     "id": "ef3a0deb-767e-4673-9de5-b14d4e33643a",
     "createdAt": "2026-03-31T23:10:30.474Z",
     "updatedAt": "2026-03-31T23:10:30.474Z"
+  },
+  {
+    "customerName": "Sarah Johnson",
+    "phone": "425-555-0199",
+    "service": "junk-removal",
+    "city": "Kirkland",
+    "notes": "Full garage cleanout, old furniture and appliances",
+    "status": "lead",
+    "id": "75488f4f-f56d-436d-952a-b59d61bffd15",
+    "createdAt": "2026-03-31T23:19:16.293Z",
+    "updatedAt": "2026-03-31T23:19:16.293Z"
   }
 ]

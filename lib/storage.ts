@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { isKVAvailable, getRedis } from './kv'
+import { isKVAvailable, kv } from './kv'
 
 /* ────────────────────────────────────────
  * Storage key constants
@@ -47,14 +47,16 @@ async function fileSet<T>(key: StorageKey, value: T): Promise<void> {
 }
 
 /* ────────────────────────────────────────
- * KV helpers (production — Upstash Redis)
+ * KV helpers (production — Vercel KV)
+ *
+ * @vercel/kv auto-serializes/deserializes JSON.
+ * Do NOT wrap with JSON.parse or JSON.stringify.
  * ──────────────────────────────────────── */
 
 async function kvGet<T>(key: StorageKey, fallback: T): Promise<T> {
   try {
-    const redis = getRedis()
-    const value = await redis.get<T>(key)
-    return value ?? fallback
+    const result = await kv.get<T>(key)
+    return result ?? fallback
   } catch (err) {
     console.error(`[storage] KV get '${key}' failed:`, err)
     return fallback
@@ -63,8 +65,7 @@ async function kvGet<T>(key: StorageKey, fallback: T): Promise<T> {
 
 async function kvSet<T>(key: StorageKey, value: T): Promise<void> {
   try {
-    const redis = getRedis()
-    await redis.set(key, value)
+    await kv.set(key, value)
   } catch (err) {
     console.error(`[storage] KV set '${key}' failed:`, err)
   }
@@ -112,13 +113,12 @@ export async function storageAppend<T>(
 }
 
 /**
- * Check whether a key exists in storage (has non-default value).
+ * Check whether a key exists in storage.
  */
 export async function storageExists(key: StorageKey): Promise<boolean> {
   if (isKVAvailable()) {
     try {
-      const redis = getRedis()
-      return (await redis.exists(key)) === 1
+      return (await kv.exists(key)) === 1
     } catch {
       return false
     }

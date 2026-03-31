@@ -1,24 +1,11 @@
-import { Redis } from '@upstash/redis'
+import { kv } from '@vercel/kv'
+
+export { kv }
 
 /**
- * Whether KV (Upstash Redis) is available.
+ * Whether Vercel KV is available.
  * In production on Vercel, KV_REST_API_URL is auto-injected.
- * In development, it's absent — fall back to file-based storage.
+ * In development, it may be present in .env.local — or absent for file fallback.
  */
 export const isKVAvailable = (): boolean =>
   Boolean(process.env.KV_REST_API_URL)
-
-/**
- * Lazy singleton Redis client — only created when KV is available.
- */
-let _redis: Redis | null = null
-
-export function getRedis(): Redis {
-  if (!_redis) {
-    _redis = new Redis({
-      url: process.env.KV_REST_API_URL!,
-      token: process.env.KV_REST_API_TOKEN!,
-    })
-  }
-  return _redis
-}
