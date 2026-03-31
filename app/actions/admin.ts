@@ -36,7 +36,7 @@ export async function getAdminData(): Promise<{
   ])
 
   const apiKey = process.env.ANTHROPIC_API_KEY || ''
-  const isKV = Boolean(process.env.KV_REST_API_URL)
+  const isKV = Boolean(process.env.REDIS_URL)
 
   return {
     auditEntries: auditEntries.slice(-50).reverse(),

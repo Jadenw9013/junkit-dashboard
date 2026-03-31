@@ -119,13 +119,11 @@ export default function WebhookSetupPage() {
 
         <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-900 mt-6">
           <p className="font-semibold mb-2">Storage Setup (Required for Production)</p>
-          <p className="text-xs mb-3">The dashboard uses Vercel KV for persistent data storage in production. Without this, all data resets on every deployment.</p>
+          <p className="text-xs mb-3">The dashboard uses Redis for persistent data storage in production. Without this, all data resets on every deployment.</p>
           <ol className="space-y-1.5 text-xs list-decimal list-inside">
-            <li>Go to your Vercel project dashboard</li>
-            <li>Click <strong>Storage</strong> tab → <strong>Create Database</strong> → select <strong>KV</strong></li>
-            <li>Name it <code className="bg-emerald-100 px-1 rounded">junkit-dashboard-kv</code></li>
-            <li>Click <strong>Connect to Project</strong></li>
-            <li>Vercel auto-adds <code className="bg-emerald-100 px-1 rounded">KV_REST_API_URL</code> and <code className="bg-emerald-100 px-1 rounded">KV_REST_API_TOKEN</code> to your env vars</li>
+            <li>Provision a Redis instance (Redis Cloud, Upstash, or any provider)</li>
+            <li>Add <code className="bg-emerald-100 px-1 rounded">REDIS_URL</code> to your Vercel project environment variables</li>
+            <li>Format: <code className="bg-emerald-100 px-1 rounded">redis://default:PASSWORD@HOST:PORT</code></li>
             <li>Redeploy the project</li>
             <li>Hit <code className="bg-emerald-100 px-1 rounded">GET /api/init</code> with header <code className="bg-emerald-100 px-1 rounded">x-developer-secret</code> to seed initial data</li>
           </ol>

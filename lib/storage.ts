@@ -1,6 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
-import { isKVAvailable, kv } from './kv'
+import { isKVAvailable, getRedis } from './kv'
 
 /* ────────────────────────────────────────
  * Storage key constants
@@ -20,7 +20,7 @@ export const KEYS = {
 type StorageKey = (typeof KEYS)[keyof typeof KEYS]
 
 /* ────────────────────────────────────────
- * File-based helpers (development only)
+ * File-based helpers (development fallback)
  * ──────────────────────────────────────── */
 
 const DATA_DIR = path.join(process.cwd(), 'data')
@@ -47,27 +47,30 @@ async function fileSet<T>(key: StorageKey, value: T): Promise<void> {
 }
 
 /* ────────────────────────────────────────
- * KV helpers (production — Vercel KV)
+ * Redis helpers (production — ioredis)
  *
- * @vercel/kv auto-serializes/deserializes JSON.
- * Do NOT wrap with JSON.parse or JSON.stringify.
+ * ioredis stores/returns raw strings.
+ * We JSON.stringify on write, JSON.parse on read.
  * ──────────────────────────────────────── */
 
 async function kvGet<T>(key: StorageKey, fallback: T): Promise<T> {
   try {
-    const result = await kv.get<T>(key)
-    return result ?? fallback
+    const redis = getRedis()
+    const raw = await redis.get(key)
+    if (raw === null) return fallback
+    return JSON.parse(raw) as T
   } catch (err) {
-    console.error(`[storage] KV get '${key}' failed:`, err)
+    console.error(`[storage] Redis get '${key}' failed:`, err)
     return fallback
   }
 }
 
 async function kvSet<T>(key: StorageKey, value: T): Promise<void> {
   try {
-    await kv.set(key, value)
+    const redis = getRedis()
+    await redis.set(key, JSON.stringify(value))
   } catch (err) {
-    console.error(`[storage] KV set '${key}' failed:`, err)
+    console.error(`[storage] Redis set '${key}' failed:`, err)
   }
 }
 
@@ -118,7 +121,8 @@ export async function storageAppend<T>(
 export async function storageExists(key: StorageKey): Promise<boolean> {
   if (isKVAvailable()) {
     try {
-      return (await kv.exists(key)) === 1
+      const redis = getRedis()
+      return (await redis.exists(key)) === 1
     } catch {
       return false
     }

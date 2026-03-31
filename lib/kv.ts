@@ -1,11 +1,23 @@
-import { kv } from '@vercel/kv'
-
-export { kv }
+import Redis from 'ioredis'
 
 /**
- * Whether Vercel KV is available.
- * In production on Vercel, KV_REST_API_URL is auto-injected.
- * In development, it may be present in .env.local — or absent for file fallback.
+ * Whether Redis is available (REDIS_URL env var is set).
  */
 export const isKVAvailable = (): boolean =>
-  Boolean(process.env.KV_REST_API_URL)
+  Boolean(process.env.REDIS_URL)
+
+/**
+ * Lazy singleton Redis client.
+ * ioredis connects via TCP using the standard redis:// connection string.
+ */
+let _redis: Redis | null = null
+
+export function getRedis(): Redis {
+  if (!_redis) {
+    _redis = new Redis(process.env.REDIS_URL!, {
+      maxRetriesPerRequest: 3,
+      lazyConnect: true,
+    })
+  }
+  return _redis
+}
