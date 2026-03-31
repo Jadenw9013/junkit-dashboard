@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Job, JobStatus } from '@/lib/types'
-import { updateJob } from '@/lib/jobs'
+import CopyButton from '@/components/CopyButton'
 
-// We can't call server functions directly from client — use a server action wrapper
 import { markJobStatus } from '@/app/actions/jobs'
 
 const statusConfig: Record<JobStatus, { label: string; color: string; bg: string; border: string; nextStatus?: JobStatus; nextLabel?: string }> = {
@@ -39,7 +37,7 @@ interface Props {
 export default function JobPipeline({ jobs }: Props) {
   const [selected, setSelected] = useState<Job | null>(null)
   const [updating, setUpdating] = useState(false)
-  const [copiedSMS, setCopiedSMS] = useState(false)
+  const [confirmDirect, setConfirmDirect] = useState(false)
 
   const statuses: JobStatus[] = ['lead', 'quoted', 'completed', 'reviewed']
   const byStatus = (s: JobStatus) => jobs.filter((j) => j.status === s)
@@ -50,7 +48,7 @@ export default function JobPipeline({ jobs }: Props) {
       await markJobStatus(job.id, newStatus)
       toast.success(`Marked as ${statusConfig[newStatus].label}`)
       setSelected(null)
-      // Trigger page refresh to reflect updated data
+      setConfirmDirect(false)
       window.location.reload()
     } catch {
       toast.error('Failed to update')
@@ -79,7 +77,7 @@ export default function JobPipeline({ jobs }: Props) {
                     <div className="p-3 rounded-xl text-xs text-center" style={{ color: '#718096', border: '1px dashed rgba(184,150,74,0.15)' }}>Empty</div>
                   ) : (
                     statusJobs.slice(0, 6).map((job) => (
-                      <JobCard key={job.id} job={job} onClick={() => setSelected(job)} />
+                      <JobCard key={job.id} job={job} onClick={() => { setSelected(job); setConfirmDirect(false) }} />
                     ))
                   )}
                 </div>
@@ -90,7 +88,7 @@ export default function JobPipeline({ jobs }: Props) {
       </div>
 
       {/* Job detail dialog */}
-      <Dialog open={!!selected} onOpenChange={(open) => !open && setSelected(null)}>
+      <Dialog open={!!selected} onOpenChange={(open) => { if (!open) { setSelected(null); setConfirmDirect(false) } }}>
         <DialogContent style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.3)', color: '#f5f0e8', maxWidth: '380px' }}>
           {selected && (
             <>
@@ -125,10 +123,7 @@ export default function JobPipeline({ jobs }: Props) {
                   <div className="rounded-lg p-3" style={{ backgroundColor: '#1a2535', border: '1px solid rgba(184,150,74,0.2)' }}>
                     <div className="flex items-center justify-between mb-1">
                       <p className="text-xs font-semibold" style={{ color: '#b8964a' }}>Draft SMS</p>
-                      <button onClick={async () => { await navigator.clipboard.writeText(selected.aiDraftSMS!); setCopiedSMS(true); setTimeout(() => setCopiedSMS(false), 2000) }}
-                        className="p-1 rounded" style={{ color: '#b8964a' }}>
-                        {copiedSMS ? <Check size={12} /> : <Copy size={12} />}
-                      </button>
+                      <CopyButton text={selected.aiDraftSMS} size={12} style={{ color: '#b8964a' }} />
                     </div>
                     <p className="text-xs" style={{ color: '#f5f0e8' }}>{selected.aiDraftSMS}</p>
                   </div>
@@ -142,6 +137,41 @@ export default function JobPipeline({ jobs }: Props) {
                     style={{ backgroundColor: '#b8964a', color: '#1a2535' }}>
                     {updating ? 'Updating...' : statusConfig[selected.status].nextLabel}
                   </button>
+                )}
+
+                {/* Direct lead → completed path */}
+                {selected.status === 'lead' && (
+                  <>
+                    {!confirmDirect ? (
+                      <button
+                        onClick={() => setConfirmDirect(true)}
+                        className="w-full py-2.5 rounded-xl text-xs font-medium"
+                        style={{ backgroundColor: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.3)', color: '#86efac' }}>
+                        Mark Completed (direct)
+                      </button>
+                    ) : (
+                      <div className="rounded-xl p-3" style={{ backgroundColor: 'rgba(74,222,128,0.05)', border: '1px solid rgba(74,222,128,0.3)' }}>
+                        <p className="text-xs mb-2" style={{ color: '#86efac' }}>
+                          Skip the quoted step and mark as complete?
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleTransition(selected, 'completed')}
+                            disabled={updating}
+                            className="flex-1 py-2 rounded-lg text-xs font-semibold disabled:opacity-50"
+                            style={{ backgroundColor: '#4ade80', color: '#1a2535' }}>
+                            {updating ? 'Updating...' : 'Yes, complete'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDirect(false)}
+                            className="flex-1 py-2 rounded-lg text-xs"
+                            style={{ backgroundColor: '#1a2535', color: '#718096' }}>
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </>

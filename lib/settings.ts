@@ -1,9 +1,6 @@
-import fs from 'fs/promises'
-import path from 'path'
 import { Settings, SettingsSnapshot } from './types'
+import { storageGet, storageSet, KEYS } from './storage'
 
-const SETTINGS_PATH = path.join(process.cwd(), 'data', 'settings.json')
-const HISTORY_PATH = path.join(process.cwd(), 'data', 'settings-history.json')
 const MAX_HISTORY = 20
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -31,33 +28,29 @@ export const DEFAULT_SETTINGS: Settings = {
   tone: 'friendly',
   responseLength: 'standard',
   includePricingInFirstResponse: true,
+  onboardingComplete: false,
   version: 1,
   updatedAt: '',
 }
 
 export async function readSettings(): Promise<Settings> {
-  try {
-    const content = await fs.readFile(SETTINGS_PATH, 'utf-8')
-    if (!content.trim()) {
-      await writeSettings(DEFAULT_SETTINGS)
-      return DEFAULT_SETTINGS
-    }
-    return JSON.parse(content) as Settings
-  } catch {
-    await fs.writeFile(SETTINGS_PATH, JSON.stringify(DEFAULT_SETTINGS, null, 2), 'utf-8')
+  const settings = await storageGet<Settings | null>(KEYS.SETTINGS, null)
+  if (!settings) {
+    await writeSettings(DEFAULT_SETTINGS)
     return DEFAULT_SETTINGS
   }
+  return settings
 }
 
 export async function writeSettings(settings: Settings): Promise<void> {
   // Snapshot current settings to history
   try {
-    const current = await readCurrentRaw()
+    const current = await storageGet<Settings | null>(KEYS.SETTINGS, null)
     if (current) {
-      const history = await readHistory()
+      const history = await storageGet<SettingsSnapshot[]>(KEYS.SETTINGS_HISTORY, [])
       history.unshift({ settings: current, savedAt: new Date().toISOString() })
       const trimmed = history.slice(0, MAX_HISTORY)
-      await fs.writeFile(HISTORY_PATH, JSON.stringify(trimmed, null, 2), 'utf-8')
+      await storageSet(KEYS.SETTINGS_HISTORY, trimmed)
     }
   } catch {
     // Don't fail the write if history fails
@@ -68,32 +61,57 @@ export async function writeSettings(settings: Settings): Promise<void> {
     version: (settings.version ?? 0) + 1,
     updatedAt: new Date().toISOString(),
   }
-  await fs.writeFile(SETTINGS_PATH, JSON.stringify(updated, null, 2), 'utf-8')
-}
-
-async function readCurrentRaw(): Promise<Settings | null> {
-  try {
-    const content = await fs.readFile(SETTINGS_PATH, 'utf-8')
-    if (!content.trim()) return null
-    return JSON.parse(content) as Settings
-  } catch {
-    return null
-  }
-}
-
-async function readHistory(): Promise<SettingsSnapshot[]> {
-  try {
-    const content = await fs.readFile(HISTORY_PATH, 'utf-8')
-    if (!content.trim()) return []
-    return JSON.parse(content) as SettingsSnapshot[]
-  } catch {
-    return []
-  }
+  await storageSet(KEYS.SETTINGS, updated)
 }
 
 export async function getPreviousSettings(): Promise<SettingsSnapshot[]> {
-  const history = await readHistory()
+  const history = await storageGet<SettingsSnapshot[]>(KEYS.SETTINGS_HISTORY, [])
   return history.sort((a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime())
+}
+
+export function validateSettings(settings: Partial<Settings>): { valid: boolean; errors: string[] } {
+  const errors: string[] = []
+
+  if (settings.businessName !== undefined) {
+    if (!settings.businessName.trim()) errors.push('Business name is required')
+    if (settings.businessName.length > 100) errors.push('Business name must be under 100 characters')
+  }
+
+  if (settings.phone !== undefined && settings.phone.trim()) {
+    const phoneDigits = settings.phone.replace(/\D/g, '')
+    if (phoneDigits.length < 7 || phoneDigits.length > 15) errors.push('Phone number looks invalid')
+  }
+
+  if (settings.googleReviewLink !== undefined && settings.googleReviewLink.trim()) {
+    if (!settings.googleReviewLink.startsWith('https://')) errors.push('Google review link must start with https://')
+  }
+
+  if (settings.pricing) {
+    for (const item of settings.pricing) {
+      if (item.min < 0) errors.push(`${item.label}: minimum price cannot be negative`)
+      if (item.max < item.min) errors.push(`${item.label}: maximum must be greater than minimum`)
+      if (item.max > 9999) errors.push(`${item.label}: maximum cannot exceed $9,999`)
+    }
+  }
+
+  if (settings.serviceArea) {
+    if (settings.serviceArea.length === 0) errors.push('At least one city required in service area')
+    if (settings.serviceArea.length > 50) errors.push('Service area cannot have more than 50 cities')
+  }
+
+  if (settings.acceptedItems && settings.acceptedItems.length > 100) {
+    errors.push('Accepted items list cannot exceed 100 items')
+  }
+
+  if (settings.refusedItems && settings.refusedItems.length > 100) {
+    errors.push('Refused items list cannot exceed 100 items')
+  }
+
+  if (settings.businessHours && settings.businessHours.length > 50) {
+    errors.push('Business hours must be under 50 characters')
+  }
+
+  return { valid: errors.length === 0, errors }
 }
 
 export function buildBusinessContext(settings: Settings): string {

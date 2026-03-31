@@ -1,5 +1,4 @@
-import fs from 'fs/promises'
-import path from 'path'
+import { storageGet, storageSet, KEYS } from './storage'
 
 interface AttemptRecord {
   ip: string
@@ -8,22 +7,15 @@ interface AttemptRecord {
   lockedUntil: string | null
 }
 
-const ATTEMPTS_PATH = path.join(process.cwd(), 'data', 'login-attempts.json')
 const MAX_ATTEMPTS = 5
 const LOCKOUT_MINUTES = 15
 
 async function readAttempts(): Promise<AttemptRecord[]> {
-  try {
-    const content = await fs.readFile(ATTEMPTS_PATH, 'utf-8')
-    if (!content.trim()) return []
-    return JSON.parse(content) as AttemptRecord[]
-  } catch {
-    return []
-  }
+  return storageGet<AttemptRecord[]>(KEYS.LOGIN_ATTEMPTS, [])
 }
 
 async function writeAttempts(records: AttemptRecord[]): Promise<void> {
-  await fs.writeFile(ATTEMPTS_PATH, JSON.stringify(records, null, 2), 'utf-8')
+  await storageSet(KEYS.LOGIN_ATTEMPTS, records)
 }
 
 export async function checkLockout(

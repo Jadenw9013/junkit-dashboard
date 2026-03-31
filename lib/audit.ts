@@ -1,19 +1,11 @@
-import fs from 'fs/promises'
-import path from 'path'
 import { AuditEntry } from './types'
+import { storageGet, storageSet, KEYS } from './storage'
 
-const AUDIT_PATH = path.join(process.cwd(), 'data', 'audit.json')
 const MAX_ENTRIES = 500
 const DROP_COUNT = 100
 
 async function readAudit(): Promise<AuditEntry[]> {
-  try {
-    const content = await fs.readFile(AUDIT_PATH, 'utf-8')
-    if (!content.trim()) return []
-    return JSON.parse(content) as AuditEntry[]
-  } catch {
-    return []
-  }
+  return storageGet<AuditEntry[]>(KEYS.AUDIT, [])
 }
 
 export async function logAction(
@@ -29,7 +21,7 @@ export async function logAction(
     entries.push(newEntry)
     const trimmed =
       entries.length > MAX_ENTRIES ? entries.slice(entries.length - (MAX_ENTRIES - DROP_COUNT)) : entries
-    await fs.writeFile(AUDIT_PATH, JSON.stringify(trimmed, null, 2), 'utf-8')
+    await storageSet(KEYS.AUDIT, trimmed)
   } catch {
     // Audit failure must never break the main flow
   }

@@ -1,14 +1,22 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { readJobs, getUnreadLeadCount } from '@/lib/jobs'
+import { readSettings } from '@/lib/settings'
 import { getTodayAuditCount } from '@/lib/audit'
-import { Job } from '@/lib/types'
-import { MessageSquare, ClipboardList, CheckCircle, Send, Settings, Zap } from 'lucide-react'
+import { MessageSquare, ClipboardList, CheckCircle, Send, Settings, Zap, Users, BarChart3, Inbox, DollarSign, Briefcase, TrendingUp } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 import JobPipeline from '@/components/JobPipeline'
+import InstallPrompt from '@/components/InstallPrompt'
 
 const DAILY_LIMIT = 50
 
 export default async function HomePage() {
+  const settings = await readSettings()
+
+  if (!settings.onboardingComplete) {
+    redirect('/onboarding')
+  }
+
   const [allJobs, unreadCount, todayUsage] = await Promise.all([
     readJobs(),
     getUnreadLeadCount(),
@@ -19,12 +27,32 @@ export default async function HomePage() {
   const usageColor = todayUsage >= DAILY_LIMIT ? '#f87171' : todayUsage >= 40 ? '#fcd34d' : '#b8964a'
   const usageLabel = todayUsage >= DAILY_LIMIT ? 'Daily limit reached' : todayUsage >= 40 ? 'Nearing daily limit' : `${todayUsage} API calls today`
 
+  // Today at a Glance
+  const todayStr = new Date().toISOString().slice(0, 10)
+  const jobsToday = allJobs.filter(
+    (j) => j.status === 'completed' && j.createdAt.startsWith(todayStr)
+  )
+  const revenueToday = jobsToday.reduce((sum, j) => sum + (j.price ?? 0), 0)
+  const leadsToday = allJobs.filter(
+    (j) => j.status === 'lead' && j.createdAt.startsWith(todayStr)
+  ).length
+  const showTodayGlance = jobsToday.length > 0 || leadsToday > 0
+
   const tools = [
     { href: '/lead', label: 'New Lead', subtitle: 'Draft a response', Icon: MessageSquare, accent: '#b8964a', badge: unreadCount > 0 ? unreadCount : null },
     { href: '/scope', label: 'Scope a Job', subtitle: 'Get a quote', Icon: ClipboardList, accent: '#b8964a', badge: null },
     { href: '/jobdone', label: 'Job Done', subtitle: 'Log & request review', Icon: CheckCircle, accent: '#4ade80', badge: null },
     { href: '/message', label: 'Send a Message', subtitle: 'Re-engage customers', Icon: Send, accent: '#60a5fa', badge: null },
   ]
+
+  const headerLinks = [
+    { href: '/customers', label: 'Customers', Icon: Users },
+    { href: '/report', label: 'Report', Icon: BarChart3 },
+    { href: '/settings', label: 'Settings', Icon: Settings },
+  ]
+
+  // Pipeline empty state check
+  const pipelineEmpty = allJobs.length === 0
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
@@ -37,10 +65,16 @@ export default async function HomePage() {
             </h1>
             <p className="text-xs mt-0.5" style={{ color: '#718096' }}>Owner Dashboard</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/settings" className="p-2 rounded-lg transition-opacity hover:opacity-80" style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.25)', color: '#718096' }}>
-              <Settings size={17} />
-            </Link>
+          <div className="flex items-center gap-1.5">
+            {headerLinks.map(({ href, label, Icon }) => (
+              <Link key={href} href={href}
+                className="flex items-center gap-1.5 px-2 py-2 rounded-lg transition-opacity hover:opacity-80"
+                style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.25)', color: '#718096' }}
+                title={label}>
+                <Icon size={17} />
+                <span className="hidden sm:inline text-xs font-medium">{label}</span>
+              </Link>
+            ))}
             <LogoutButton />
           </div>
         </div>
@@ -75,6 +109,27 @@ export default async function HomePage() {
           </div>
         </Link>
 
+        {/* Today at a Glance */}
+        {showTodayGlance && (
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
+              <Briefcase size={18} className="mx-auto mb-1" style={{ color: '#4ade80' }} />
+              <p className="text-lg font-bold" style={{ color: '#f5f0e8' }}>{jobsToday.length}</p>
+              <p className="text-[10px] uppercase tracking-wider" style={{ color: '#718096' }}>Jobs Today</p>
+            </div>
+            <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
+              <DollarSign size={18} className="mx-auto mb-1" style={{ color: '#b8964a' }} />
+              <p className="text-lg font-bold" style={{ color: '#f5f0e8' }}>${revenueToday}</p>
+              <p className="text-[10px] uppercase tracking-wider" style={{ color: '#718096' }}>Revenue</p>
+            </div>
+            <div className="rounded-xl p-3 text-center" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
+              <TrendingUp size={18} className="mx-auto mb-1" style={{ color: '#60a5fa' }} />
+              <p className="text-lg font-bold" style={{ color: '#f5f0e8' }}>{leadsToday}</p>
+              <p className="text-[10px] uppercase tracking-wider" style={{ color: '#718096' }}>Leads Today</p>
+            </div>
+          </div>
+        )}
+
         {/* Usage Indicator */}
         <div className="mb-6 rounded-xl p-3" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.15)' }}>
           <div className="flex items-center justify-between mb-1.5">
@@ -91,14 +146,20 @@ export default async function HomePage() {
           <h2 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: '#718096' }}>
             Jobs
           </h2>
-          {allJobs.length === 0 ? (
-            <p className="text-sm text-center py-8" style={{ color: '#718096' }}>
-              No jobs yet — use the tools above to get started
-            </p>
+          {pipelineEmpty ? (
+            <div className="flex flex-col items-center py-10 text-center">
+              <Inbox size={40} style={{ color: '#718096' }} className="mb-3" />
+              <h3 className="text-sm font-semibold mb-1" style={{ color: '#f5f0e8' }}>Pipeline is empty</h3>
+              <p className="text-xs max-w-[240px]" style={{ color: '#718096' }}>
+                Use New Lead to capture inquiries or Quick Log to add a job instantly.
+              </p>
+            </div>
           ) : (
             <JobPipeline jobs={allJobs} />
           )}
         </div>
+
+        <InstallPrompt />
       </div>
     </div>
   )

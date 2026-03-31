@@ -121,3 +121,34 @@ input:focus, textarea:focus, select:focus {
 input::placeholder, textarea::placeholder {
   color: #718096 !important;
 }
+
+/* Print Styles */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-report {
+    color: black;
+  }
+
+  .print-report * {
+    color: black !important;
+    border-color: #ddd !important;
+    background-color: transparent !important;
+  }
+
+  .print-report .rounded-xl {
+    border: 1px solid #ddd !important;
+    background-color: #f9f9f9 !important;
+  }
+}

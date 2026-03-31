@@ -6,6 +6,11 @@ import { Job, ServiceType } from '@/lib/types'
 import { readSettings, buildBusinessContext } from '@/lib/settings'
 import { logAction } from '@/lib/audit'
 import { getFallback } from '@/lib/fallbacks'
+import { upsertCustomer } from '@/lib/customers'
+import { sanitizeName, sanitizePhone, sanitizeText, sanitizePrice } from '@/lib/sanitize'
+import { checkRateLimit } from '@/lib/rateLimiter'
+
+const TIMEOUT_MS = 15000
 
 export interface JobDoneInput {
   customerName: string
@@ -18,16 +23,30 @@ export interface JobDoneInput {
 
 export async function logJobAndGetReview(
   input: JobDoneInput
-): Promise<{ job: Job; reviewSMS: string; usedFallback?: boolean }> {
+): Promise<{ job: Job; reviewSMS: string; usedFallback?: boolean; isNewCustomer?: boolean; error?: string }> {
+  const rl = checkRateLimit('jobdone')
+  if (!rl.allowed) {
+    return { job: {} as Job, reviewSMS: '', error: 'rate_limited' }
+  }
+
+  const cleanInput: JobDoneInput = {
+    customerName: sanitizeName(input.customerName),
+    phone: sanitizePhone(input.phone),
+    city: sanitizeName(input.city),
+    service: input.service,
+    price: sanitizePrice(input.price) ?? 0,
+    notes: input.notes ? sanitizeText(input.notes, 2000) : undefined,
+  }
+
   const settings = await readSettings()
   const context = buildBusinessContext(settings)
-  const firstName = input.customerName.split(' ')[0]
+  const firstName = cleanInput.customerName.split(' ')[0]
   const serviceLabel =
-    input.service === 'junk-removal'
+    cleanInput.service === 'junk-removal'
       ? 'junk removal'
-      : input.service === 'demolition'
+      : cleanInput.service === 'demolition'
       ? 'demolition'
-      : input.service === 'trailer-rental'
+      : cleanInput.service === 'trailer-rental'
       ? 'trailer rental'
       : 'job'
 
@@ -37,10 +56,15 @@ export async function logJobAndGetReview(
   let usedFallback = false
 
   try {
-    const message = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system: `${context}
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Claude API timeout')), TIMEOUT_MS)
+    )
+
+    const message = await Promise.race([
+      anthropic.messages.create({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        system: `${context}
 
 Write a review request SMS for ${settings.businessName}, a local junk removal business.
 Use the customer's first name. Reference the specific service.
@@ -50,13 +74,15 @@ End with this exact link: ${reviewLink}
 
 Example tone:
 'Hey Mike, thanks for having us out today for the garage cleanout! If you have a sec, a Google review would mean the world to us: ${reviewLink}'`,
-      messages: [
-        {
-          role: 'user',
-          content: `Customer first name: ${firstName}\nService performed: ${serviceLabel}`,
-        },
-      ],
-    })
+        messages: [
+          {
+            role: 'user',
+            content: `Customer first name: ${firstName}\nService performed: ${serviceLabel}`,
+          },
+        ],
+      }),
+      timeoutPromise,
+    ])
 
     reviewSMS = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
 
@@ -86,17 +112,26 @@ Example tone:
   }
 
   const job = await addJob({
-    customerName: input.customerName,
-    phone: input.phone,
-    city: input.city,
-    service: input.service,
-    price: input.price,
-    notes: input.notes,
+    customerName: cleanInput.customerName,
+    phone: cleanInput.phone,
+    city: cleanInput.city,
+    service: cleanInput.service,
+    price: cleanInput.price,
+    notes: cleanInput.notes,
     status: 'completed',
     reviewRequestSMS: reviewSMS,
   })
 
-  return { job, reviewSMS, usedFallback }
+  const { isNew: isNewCustomer } = await upsertCustomer({
+    name: cleanInput.customerName,
+    phone: cleanInput.phone,
+    city: cleanInput.city,
+    service: cleanInput.service,
+    price: cleanInput.price,
+    jobId: job.id,
+  })
+
+  return { job, reviewSMS, usedFallback, isNewCustomer }
 }
 
 export async function markJobReviewed(jobId: string) {

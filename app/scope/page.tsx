@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { generateQuote, saveQuotedJob, ScopeInput, QuoteResult } from '@/app/actions/scope'
 import { ServiceType } from '@/lib/types'
 import BackButton from '@/components/BackButton'
 import FallbackBanner from '@/components/FallbackBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import CopyButton from '@/components/CopyButton'
 
 function ToggleButtons({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
@@ -39,26 +40,32 @@ export default function ScopePage() {
     appliances: false, difficultAccess: false, demoRequired: false,
   })
   const [loading, setLoading] = useState(false)
-  const [quote, setQuote] = useState<(QuoteResult & { usedFallback?: boolean }) | null>(null)
-  const [copiedQuote, setCopiedQuote] = useState(false)
+  const [quote, setQuote] = useState<(QuoteResult & { usedFallback?: boolean; error?: string }) | null>(null)
   const [saving, setSaving] = useState(false)
+  const [rateLimited, setRateLimited] = useState(false)
 
   async function handleGenerate() {
     if (!form.description.trim()) return
     setLoading(true)
+    setRateLimited(false)
     try {
       const result = await generateQuote(form)
-      setQuote(result)
-    } catch { toast.error('Failed to generate quote') }
+      if (result.error === 'rate_limited') {
+        setRateLimited(true)
+        setQuote(null)
+      } else {
+        setQuote(result)
+      }
+    } catch { toast.error('Something went wrong') }
     setLoading(false)
   }
 
-  async function handleSave() {
+  async function handleSave(saveAs: 'lead' | 'quoted') {
     if (!quote) return
     setSaving(true)
     try {
-      await saveQuotedJob(form, quote)
-      toast.success('Job saved as quoted')
+      await saveQuotedJob(form, quote, saveAs)
+      toast.success(saveAs === 'lead' ? 'Saved as lead' : 'Saved as quoted job')
     } catch { toast.error('Failed to save job') }
     setSaving(false)
   }
@@ -117,6 +124,16 @@ export default function ScopePage() {
           </button>
         </div>
 
+        {rateLimited && (
+          <div className="mt-4 rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)' }}>
+            <Clock size={20} style={{ color: '#fbbf24' }} />
+            <div>
+              <p className="text-sm font-semibold" style={{ color: '#fbbf24' }}>Too many requests</p>
+              <p className="text-xs" style={{ color: '#718096' }}>Try again in a few minutes.</p>
+            </div>
+          </div>
+        )}
+
         {quote && (
           <div className="mt-6 space-y-4">
             {quote.usedFallback && <FallbackBanner />}
@@ -142,10 +159,9 @@ export default function ScopePage() {
                   <p className="text-sm leading-relaxed italic flex-1" style={{ color: '#f5f0e8' }}>
                     &ldquo;{quote.verbalQuote}&rdquo;
                   </p>
-                  <button onClick={async () => { await navigator.clipboard.writeText(quote.verbalQuote); setCopiedQuote(true); setTimeout(() => setCopiedQuote(false), 2000) }}
-                    className="p-1.5 rounded-lg shrink-0 mt-0.5" style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#b8964a' }}>
-                    {copiedQuote ? <Check size={14} /> : <Copy size={14} />}
-                  </button>
+                  <CopyButton text={quote.verbalQuote}
+                    className="p-1.5 shrink-0 mt-0.5"
+                    style={{ backgroundColor: 'rgba(184,150,74,0.1)', color: '#b8964a' }} />
                 </div>
                 <p className="text-xs mt-1" style={{ color: '#718096' }}>Read this aloud on the phone</p>
               </div>
@@ -163,10 +179,18 @@ export default function ScopePage() {
 
             <FeedbackWidget tool="scope" outputSummary={quote.verbalQuote.slice(0, 100)} />
 
-            <button onClick={handleSave} disabled={saving} className="w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
-              style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.3)', color: '#b8964a' }}>
-              {saving ? 'Saving...' : 'Save Quoted Job'}
-            </button>
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => handleSave('lead')} disabled={saving}
+                className="py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
+                style={{ backgroundColor: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#93c5fd' }}>
+                {saving ? 'Saving...' : 'Save as Lead'}
+              </button>
+              <button onClick={() => handleSave('quoted')} disabled={saving}
+                className="py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
+                style={{ backgroundColor: 'rgba(184,150,74,0.1)', border: '1px solid rgba(184,150,74,0.3)', color: '#b8964a' }}>
+                {saving ? 'Saving...' : 'Save as Quoted'}
+              </button>
+            </div>
           </div>
         )}
       </div>

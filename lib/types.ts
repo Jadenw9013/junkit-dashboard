@@ -49,6 +49,7 @@ export interface Settings {
   tone: 'friendly' | 'formal' | 'casual'
   responseLength: 'brief' | 'standard' | 'detailed'
   includePricingInFirstResponse: boolean
+  onboardingComplete: boolean
   version: number
   updatedAt: string
 }
@@ -78,4 +79,20 @@ export interface AuditEntry {
   durationMs?: number
   success: boolean
   error?: string
+}
+
+export interface Customer {
+  id: string
+  createdAt: string
+  updatedAt: string
+  name: string
+  phone: string
+  city: string
+  totalJobs: number
+  totalRevenue: number
+  lastJobDate: string
+  lastJobService: ServiceType
+  tags: string[]
+  notes: string
+  jobs: string[]
 }

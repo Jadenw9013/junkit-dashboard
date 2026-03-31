@@ -4,6 +4,10 @@ import { anthropic, MODEL, MAX_TOKENS } from '@/lib/anthropic'
 import { readSettings, buildBusinessContext } from '@/lib/settings'
 import { logAction } from '@/lib/audit'
 import { getFallback } from '@/lib/fallbacks'
+import { sanitizeText, sanitizeName, sanitizePrice } from '@/lib/sanitize'
+import { checkRateLimit } from '@/lib/rateLimiter'
+
+const TIMEOUT_MS = 15000
 
 export interface ReEngagementInput {
   customerName: string
@@ -26,15 +30,28 @@ async function callClaude(
   system: string,
   userContent: string,
   actionName: string
-): Promise<{ text: string; usedFallback?: boolean }> {
+): Promise<{ text: string; usedFallback?: boolean; error?: string }> {
+  const rl = checkRateLimit('message')
+  if (!rl.allowed) {
+    return { text: '', error: 'rate_limited' }
+  }
+
   const start = Date.now()
   try {
-    const message = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: MAX_TOKENS,
-      system,
-      messages: [{ role: 'user', content: userContent }],
-    })
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Claude API timeout')), TIMEOUT_MS)
+    )
+
+    const message = await Promise.race([
+      anthropic.messages.create({
+        model: MODEL,
+        max_tokens: MAX_TOKENS,
+        system,
+        messages: [{ role: 'user', content: userContent }],
+      }),
+      timeoutPromise,
+    ])
+
     const text = message.content[0].type === 'text' ? message.content[0].text.trim() : ''
 
     await logAction({
@@ -66,7 +83,7 @@ async function callClaude(
 
 export async function generateReEngagement(
   input: ReEngagementInput
-): Promise<{ text: string; usedFallback?: boolean }> {
+): Promise<{ text: string; usedFallback?: boolean; error?: string }> {
   const settings = await readSettings()
   const context = buildBusinessContext(settings)
   return callClaude(
@@ -75,17 +92,17 @@ export async function generateReEngagement(
 Write a re-engagement SMS for a past customer of ${settings.businessName}.
 First name only, reference their past service, add a timely hook.
 Under 160 chars. ${settings.tone} tone. No pressure.`,
-    `Customer first name: ${input.customerName.split(' ')[0]}
-Past service: ${input.pastService}
-Months since last job: ${input.monthsSince}
-Seasonal context: ${input.seasonalContext || 'none'}`,
+    `Customer first name: ${sanitizeName(input.customerName.split(' ')[0])}
+Past service: ${sanitizeText(input.pastService, 100)}
+Months since last job: ${sanitizeText(input.monthsSince, 20)}
+Seasonal context: ${sanitizeText(input.seasonalContext || 'none', 200)}`,
     'generateReEngagement'
   )
 }
 
 export async function generateFollowUp(
   input: FollowUpInput
-): Promise<{ text: string; usedFallback?: boolean }> {
+): Promise<{ text: string; usedFallback?: boolean; error?: string }> {
   const settings = await readSettings()
   const context = buildBusinessContext(settings)
   return callClaude(
@@ -93,16 +110,16 @@ export async function generateFollowUp(
 
 Write a soft follow-up SMS for ${settings.businessName}. Customer got a quote but hasn't booked.
 Be friendly not pushy. Mention same-day availability as a hook. Under 160 chars.`,
-    `Customer first name: ${input.customerName.split(' ')[0]}
-Quoted amount: ${input.quotedAmount}
-Days since last contact: ${input.daysSince}`,
+    `Customer first name: ${sanitizeName(input.customerName.split(' ')[0])}
+Quoted amount: ${sanitizePrice(input.quotedAmount) ?? input.quotedAmount}
+Days since last contact: ${sanitizeText(input.daysSince, 20)}`,
     'generateFollowUp'
   )
 }
 
 export async function generateCustomMessage(
   input: CustomMessageInput
-): Promise<{ text: string; usedFallback?: boolean }> {
+): Promise<{ text: string; usedFallback?: boolean; error?: string }> {
   const settings = await readSettings()
   const context = buildBusinessContext(settings)
   return callClaude(
@@ -111,7 +128,7 @@ export async function generateCustomMessage(
 You are a message writer for ${settings.businessName}. Based on the situation described,
 write the most appropriate SMS message. Under 160 chars.
 Match the ${settings.tone} tone of ${settings.businessName}: friendly, direct, locally owned.`,
-    input.situation,
+    sanitizeText(input.situation, 2000),
     'generateCustomMessage'
   )
 }

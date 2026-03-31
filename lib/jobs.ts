@@ -1,21 +1,12 @@
-import fs from 'fs/promises'
-import path from 'path'
 import { Job } from './types'
-
-const DATA_PATH = path.join(process.cwd(), 'data', 'jobs.json')
+import { storageGet, storageSet, KEYS } from './storage'
 
 export async function readJobs(): Promise<Job[]> {
-  try {
-    const content = await fs.readFile(DATA_PATH, 'utf-8')
-    if (!content.trim()) return []
-    return JSON.parse(content) as Job[]
-  } catch {
-    return []
-  }
+  return storageGet<Job[]>(KEYS.JOBS, [])
 }
 
 export async function writeJobs(jobs: Job[]): Promise<void> {
-  await fs.writeFile(DATA_PATH, JSON.stringify(jobs, null, 2), 'utf-8')
+  await storageSet(KEYS.JOBS, jobs)
 }
 
 export async function addJob(

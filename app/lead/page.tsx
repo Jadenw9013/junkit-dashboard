@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { draftLeadResponse, saveLeadJob } from '@/app/actions/lead'
-import { ServiceType } from '@/lib/types'
+import { ServiceType, Customer } from '@/lib/types'
 import BackButton from '@/components/BackButton'
 import FallbackBanner from '@/components/FallbackBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
@@ -18,7 +18,7 @@ const inputStyle = {
 export default function LeadPage() {
   const [inquiry, setInquiry] = useState('')
   const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<{ sms: string; email: string; usedFallback?: boolean } | null>(null)
+  const [result, setResult] = useState<{ sms: string; email: string; usedFallback?: boolean; returningCustomer?: Customer | null } | null>(null)
   const [copiedSms, setCopiedSms] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [showSaveForm, setShowSaveForm] = useState(false)
@@ -59,6 +59,8 @@ export default function LeadPage() {
     setSaving(false)
   }
 
+  const rc = result?.returningCustomer
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#1a2535' }}>
       <div className="mx-auto max-w-[430px] px-4 pb-8">
@@ -91,6 +93,25 @@ export default function LeadPage() {
         {result && (
           <div className="mt-6 space-y-4">
             {result.usedFallback && <FallbackBanner />}
+
+            {/* Returning Customer Card */}
+            {rc && (
+              <div className="rounded-xl p-4" style={{
+                backgroundColor: 'rgba(184,150,74,0.08)',
+                border: '2px solid rgba(184,150,74,0.5)',
+              }}>
+                <p className="text-sm font-semibold" style={{ color: '#b8964a' }}>
+                  🔄 Returning customer — {rc.name} from {rc.city}
+                </p>
+                <p className="text-xs mt-1" style={{ color: '#d4ae6a' }}>
+                  {rc.totalJobs} previous job{rc.totalJobs !== 1 ? 's' : ''} · Last: {
+                    rc.lastJobService === 'junk-removal' ? 'Junk Removal' :
+                    rc.lastJobService === 'demolition' ? 'Demolition' :
+                    rc.lastJobService === 'trailer-rental' ? 'Trailer Rental' : 'Job'
+                  } · {new Date(rc.lastJobDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </p>
+              </div>
+            )}
 
             {/* SMS Card */}
             <div className="rounded-xl p-4" style={{ backgroundColor: '#243044', border: '1px solid rgba(184,150,74,0.4)' }}>

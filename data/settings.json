@@ -23,6 +23,7 @@
   "tone": "friendly",
   "responseLength": "standard",
   "includePricingInFirstResponse": true,
+  "onboardingComplete": false,
   "version": 1,
   "updatedAt": ""
 }

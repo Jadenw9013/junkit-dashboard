@@ -454,6 +454,13 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
             )}
           </div>
         </div>
+
+        {/* Redo wizard */}
+        <div className="text-center mt-6 mb-4">
+          <a href="/onboarding" className="text-xs underline" style={{ color: '#718096' }}>
+            Want to redo the initial setup? Run wizard again →
+          </a>
+        </div>
       </div>
 
       {/* Restore Confirmation Dialog */}

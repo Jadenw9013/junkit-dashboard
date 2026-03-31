@@ -17,13 +17,25 @@ const barlow = Barlow({
 
 export const metadata: Metadata = {
   title: 'Junk It Dashboard',
-  description: 'Owner dashboard for Junk It junk removal',
+  description: 'Private owner dashboard',
+  robots: { index: false, follow: false },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Junk It',
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+  },
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
+  themeColor: '#1a2535',
 }
 
 export default function RootLayout({

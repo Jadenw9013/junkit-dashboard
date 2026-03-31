@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "customerName": "Test Customer",
+    "phone": "425-555-0100",
+    "service": "junk-removal",
+    "city": "Bellevue",
+    "notes": "Old couch and some boxes",
+    "status": "lead",
+    "id": "ef3a0deb-767e-4673-9de5-b14d4e33643a",
+    "createdAt": "2026-03-31T23:10:30.474Z",
+    "updatedAt": "2026-03-31T23:10:30.474Z"
+  }
+]

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { addJob } from '@/lib/jobs'
 import { ServiceType } from '@/lib/types'
+import { upsertCustomer } from '@/lib/customers'
 
 // In-memory rate limiting (resets on server restart)
 const ipRequestCounts = new Map<string, { count: number; windowStart: number }>()
@@ -64,6 +65,16 @@ export async function POST(request: NextRequest) {
     notes: description ?? '',
     status: 'lead',
   })
+
+  if (phone) {
+    await upsertCustomer({
+      name: customerName ?? 'Unknown',
+      phone: phone ?? '',
+      city: city ?? '',
+      service: (service as ServiceType) ?? 'unknown',
+      jobId: job.id,
+    })
+  }
 
   return NextResponse.json({ success: true, jobId: job.id })
 }

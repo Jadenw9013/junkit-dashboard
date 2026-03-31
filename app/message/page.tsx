@@ -1,12 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { Copy, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { generateReEngagement, generateFollowUp, generateCustomMessage } from '@/app/actions/message'
 import BackButton from '@/components/BackButton'
 import FallbackBanner from '@/components/FallbackBanner'
 import FeedbackWidget from '@/components/FeedbackWidget'
+import { Suspense } from 'react'
 
 type Tab = 're-engagement' | 'follow-up' | 'custom'
 
@@ -16,7 +18,8 @@ const inputStyle = {
   color: '#f5f0e8',
 }
 
-export default function MessagePage() {
+function MessagePageInner() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<Tab>('re-engagement')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ text: string; usedFallback?: boolean } | null>(null)
@@ -25,6 +28,24 @@ export default function MessagePage() {
   const [reForm, setReForm] = useState({ customerName: '', pastService: 'junk-removal', monthsSince: '3-6', seasonalContext: '' })
   const [fuForm, setFuForm] = useState({ customerName: '', quotedAmount: '', daysSince: '3-5' })
   const [customSituation, setCustomSituation] = useState('')
+
+  // Pre-populate from search params (from customer re-engage link)
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    const name = searchParams.get('name')
+    const service = searchParams.get('service')
+    const months = searchParams.get('months')
+
+    if (tab === 'reengagement') {
+      setActiveTab('re-engagement')
+      setReForm((prev) => ({
+        ...prev,
+        customerName: name || prev.customerName,
+        pastService: service || prev.pastService,
+        monthsSince: months || prev.monthsSince,
+      }))
+    }
+  }, [searchParams])
 
   async function handleGenerate() {
     setLoading(true)
@@ -141,5 +162,13 @@ export default function MessagePage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function MessagePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#1a2535' }}><p style={{ color: '#718096' }}>Loading...</p></div>}>
+      <MessagePageInner />
+    </Suspense>
   )
 }

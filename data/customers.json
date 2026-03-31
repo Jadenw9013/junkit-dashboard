@@ -1,0 +1,19 @@
+[
+  {
+    "id": "0acf9229-d681-41f2-b8f1-31a1115c97bb",
+    "createdAt": "2026-03-31T23:10:30.476Z",
+    "updatedAt": "2026-03-31T23:10:30.476Z",
+    "name": "Test Customer",
+    "phone": "425-555-0100",
+    "city": "Bellevue",
+    "totalJobs": 1,
+    "totalRevenue": 0,
+    "lastJobDate": "2026-03-31T23:10:30.476Z",
+    "lastJobService": "junk-removal",
+    "tags": [],
+    "notes": "",
+    "jobs": [
+      "ef3a0deb-767e-4673-9de5-b14d4e33643a"
+    ]
+  }
+]
