@@ -92,8 +92,7 @@ export default function LeadPage() {
                 <div style={{ fontSize: '0.75rem', color: 'var(--gold)', fontWeight: 500, marginTop: 1 }}>
                   Returning customer · {rc.totalJobs} past job{rc.totalJobs !== 1 ? 's' : ''} · Last: {
                     rc.lastJobService === 'junk-removal' ? 'Junk Removal' :
-                    rc.lastJobService === 'demolition' ? 'Demolition' :
-                    rc.lastJobService === 'trailer-rental' ? 'Trailer Rental' : 'Job'
+                    rc.lastJobService === 'demolition' ? 'Demolition' : 'Job'
                   }, {new Date(rc.lastJobDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                 </div>
               </div>
@@ -242,7 +241,7 @@ export default function LeadPage() {
                       }}>
                       <option value="junk-removal">Junk Removal</option>
                       <option value="demolition">Light Demolition</option>
-                      <option value="trailer-rental">Trailer Rental</option>
+
                       <option value="unknown">Unknown</option>
                     </select>
                   </div>

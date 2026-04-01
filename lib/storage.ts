@@ -17,6 +17,9 @@ export const KEYS = {
   SETTINGS_HISTORY: 'settings-history',
   RECOVERY_CODE: 'recovery-code',
   PASSWORD_OVERRIDE: 'password-override',
+  AUTOMATION_LOGS: 'automation-logs',
+  PENDING_FOLLOWUPS: 'pending-followups',
+  PENDING_REENGAGEMENTS: 'pending-reengagements',
 } as const
 
 type StorageKey = (typeof KEYS)[keyof typeof KEYS]

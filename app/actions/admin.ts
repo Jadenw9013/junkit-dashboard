@@ -3,11 +3,15 @@
 import { readSettings, buildBusinessContext } from '@/lib/settings'
 import { readFeedback } from '@/lib/feedback'
 import { storageGet, KEYS } from '@/lib/storage'
-import { AuditEntry, FeedbackEntry } from '@/lib/types'
+import { AuditEntry, FeedbackEntry, AutomationLogEntry } from '@/lib/types'
+import { getAutomationLogs } from '@/lib/db'
+import { checkAutomationConfig, AutomationConfigResult } from '@/lib/validateEnv'
 
 export async function getAdminData(): Promise<{
   auditEntries: AuditEntry[]
   feedbackEntries: FeedbackEntry[]
+  automationLogs: AutomationLogEntry[]
+  automationConfig: AutomationConfigResult
   health: {
     jobsCount: number
     customersCount: number
@@ -23,11 +27,14 @@ export async function getAdminData(): Promise<{
     storageBackend: 'kv' | 'file'
   }
 }> {
-  const [auditEntries, feedbackEntries, settings] = await Promise.all([
+  const [auditEntries, feedbackEntries, settings, automationLogs] = await Promise.all([
     storageGet<AuditEntry[]>(KEYS.AUDIT, []),
     readFeedback(),
     readSettings(),
+    getAutomationLogs(50),
   ])
+
+  const automationConfig = checkAutomationConfig()
 
   const [jobs, customers, sessions] = await Promise.all([
     storageGet<unknown[]>(KEYS.JOBS, []),
@@ -41,6 +48,8 @@ export async function getAdminData(): Promise<{
   return {
     auditEntries: auditEntries.slice(-50).reverse(),
     feedbackEntries,
+    automationLogs,
+    automationConfig,
     health: {
       jobsCount: jobs.length,
       customersCount: customers.length,

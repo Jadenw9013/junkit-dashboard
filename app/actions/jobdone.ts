@@ -46,5 +46,19 @@ export async function logJob(
     jobId: job.id,
   })
 
+  // Fire job complete automation in background
+  try {
+    const { runJobCompleteAutomation } = await import('@/lib/automations/jobComplete')
+    runJobCompleteAutomation({
+      jobId: job.id,
+      customerName: cleanInput.customerName,
+      phone: cleanInput.phone,
+      service: cleanInput.service,
+      city: cleanInput.city,
+    }).catch((e: unknown) => console.log('[AUTOMATION] Job complete automation error:', e))
+  } catch (e) {
+    console.log('[AUTOMATION] Could not trigger job complete:', e)
+  }
+
   return { job, isNewCustomer }
 }

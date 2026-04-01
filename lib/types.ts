@@ -1,5 +1,5 @@
 export type JobStatus = 'lead' | 'quoted' | 'completed' | 'reviewed'
-export type ServiceType = 'junk-removal' | 'demolition' | 'trailer-rental' | 'unknown'
+export type ServiceType = 'junk-removal' | 'demolition' | 'unknown'
 
 export interface Job {
   id: string
@@ -95,4 +95,17 @@ export interface Customer {
   tags: string[]
   notes: string
   jobs: string[]
+}
+
+export interface AutomationLogEntry {
+  id: string
+  timestamp: string
+  trigger: string
+  action: string
+  recipient?: string
+  success: boolean
+  fallbackUsed: boolean
+  error?: string
+  jobId?: string
+  customerId?: string
 }

@@ -38,7 +38,7 @@ export default function OnboardingClient({ initialSettings }: { initialSettings:
   const [newCity, setNewCity] = useState('')
 
   // Step 4 — Pricing
-  const corePricing = ['quarter', 'half', 'full', 'demo', 'trailer']
+  const corePricing = ['quarter', 'half', 'full', 'demo']
   const [pricing, setPricing] = useState<PricingItem[]>(
     initialSettings.pricing.filter((p) => corePricing.includes(p.id))
   )

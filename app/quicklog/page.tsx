@@ -57,7 +57,7 @@ export default function QuickLogPage() {
               className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle}>
               <option value="junk-removal">Junk Removal</option>
               <option value="demolition">Light Demolition</option>
-              <option value="trailer-rental">Trailer Rental</option>
+
               <option value="unknown">Unknown</option>
             </select>
             <input type="text" placeholder="City" value={form.city}

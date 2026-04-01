@@ -18,7 +18,7 @@ const statusConfig: Record<JobStatus, {
 }
 
 const serviceLabels: Record<string, string> = {
-  'junk-removal': 'Junk', 'demolition': 'Demo', 'trailer-rental': 'Trailer', 'unknown': 'Other',
+  'junk-removal': 'Junk', 'demolition': 'Demo', 'unknown': 'Other',
 }
 
 function formatDate(iso: string) {

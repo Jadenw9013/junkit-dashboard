@@ -99,7 +99,7 @@ function MessagePageInner() {
               className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle}>
               <option value="junk-removal">Junk Removal</option>
               <option value="demolition">Light Demolition</option>
-              <option value="trailer-rental">Trailer Rental</option>
+
             </select>
             <select value={reForm.monthsSince} onChange={(e) => setReForm({ ...reForm, monthsSince: e.target.value })}
               className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle}>

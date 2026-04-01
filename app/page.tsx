@@ -90,27 +90,27 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
           {/* SECTION B — Today Strip */}
           {showTodayStrip && (
             <div style={{
-              backgroundColor: 'var(--navy)', borderRadius: 'var(--r-lg)',
+              backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)',
               padding: '1.125rem 1.375rem', marginBottom: '1.375rem',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              flexWrap: 'wrap', gap: '1rem',
+              flexWrap: 'wrap', gap: '1rem', boxShadow: 'var(--shadow-sm)',
             }}>
               <div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', marginBottom: 2 }}>TODAY</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'rgba(255,255,255,0.6)' }}>{dateStr}</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--gray)', marginBottom: 2 }}>TODAY</div>
+                <div style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--navy)' }}>{dateStr}</div>
               </div>
               <div style={{ display: 'flex', gap: '1.75rem' }}>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: '#FFFFFF' }}>{jobsToday.length}</div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>Jobs</div>
+                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: 'var(--navy)' }}>{jobsToday.length}</div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'var(--gray)', marginTop: 2 }}>Jobs</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: 'var(--gold-light)' }}>${revenueToday}</div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>Revenue</div>
+                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: 'var(--gold)' }}>${revenueToday}</div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'var(--gray)', marginTop: 2 }}>Revenue</div>
                 </div>
                 <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: '#93C5FD' }}>{leadsToday}</div>
-                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>Leads</div>
+                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.875rem', lineHeight: 1, color: 'var(--blue)' }}>{leadsToday}</div>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 500, color: 'var(--gray)', marginTop: 2 }}>Leads</div>
                 </div>
               </div>
             </div>
@@ -121,22 +121,22 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
             TOOLS
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem', marginBottom: '1.5rem' }}>
-            {/* Card 1 — New Lead (dark) */}
+            {/* Card 1 — New Lead */}
             <Link href="/lead" style={{
-              backgroundColor: 'var(--navy)', border: '1px solid var(--navy)', borderRadius: 'var(--r-lg)',
+              backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--r-lg)',
               padding: '1.125rem', boxShadow: 'var(--shadow-sm)', cursor: 'pointer',
               transition: 'all 0.18s', display: 'flex', flexDirection: 'column', gap: '0.625rem',
               position: 'relative', overflow: 'hidden', textDecoration: 'none',
             }}>
-              <span style={{ position: 'absolute', top: '1rem', right: '1rem', color: 'rgba(255,255,255,0.3)', fontSize: '1.1rem' }}>→</span>
+              <span style={{ position: 'absolute', top: '1rem', right: '1rem', color: 'var(--gray)', opacity: 0.3, fontSize: '1.1rem' }}>→</span>
               {unreadCount > 0 && (
                 <span style={{ position: 'absolute', top: '0.875rem', right: '2rem', backgroundColor: '#DC2626', color: '#FFFFFF', fontSize: '0.625rem', fontWeight: 700, padding: '1px 6px', borderRadius: 10 }}>{unreadCount}</span>
               )}
-              <div style={{ width: 38, height: 38, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <MessageSquare size={20} color="#FFFFFF" />
+              <div style={{ width: 38, height: 38, borderRadius: 8, backgroundColor: 'var(--gold-pale)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <MessageSquare size={20} color="var(--gold)" />
               </div>
-              <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#FFFFFF' }}>New Lead</span>
-              <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.5 }}>Draft a reply to a customer inquiry — ready to send in seconds</span>
+              <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--navy)' }}>New Lead</span>
+              <span style={{ fontSize: '0.8125rem', color: 'var(--gray)', lineHeight: 1.5 }}>Draft a reply to a customer inquiry — ready to send in seconds</span>
             </Link>
 
             {/* Card 2 — Scope a Job */}

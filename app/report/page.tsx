@@ -9,7 +9,7 @@ import BackButton from '@/components/BackButton'
 const serviceLabels: Record<string, string> = {
   'junk-removal': 'Junk Removal',
   'demolition': 'Demolition',
-  'trailer-rental': 'Trailer Rental',
+
   'unknown': 'Other',
 }
 

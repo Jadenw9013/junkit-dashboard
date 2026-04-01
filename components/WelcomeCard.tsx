@@ -21,22 +21,16 @@ export default function WelcomeCard() {
 
   return (
     <div style={{
-      background: 'var(--navy)', borderRadius: 'var(--r-lg)',
-      padding: '1.25rem 1.375rem', marginBottom: '1.375rem',
-      position: 'relative', overflow: 'hidden',
+      background: 'var(--surface)', border: '1px solid var(--gold-border)',
+      borderRadius: 'var(--r-lg)', padding: '1.25rem 1.375rem',
+      marginBottom: '1.375rem', position: 'relative',
+      boxShadow: 'var(--shadow-sm)',
     }}>
-      {/* Gold radial glow */}
-      <div style={{
-        position: 'absolute', top: 0, right: 0, bottom: 0, left: 0,
-        background: 'radial-gradient(circle at top right, rgba(245,197,24,0.15), transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-
       <button onClick={dismiss} style={{
         position: 'absolute', top: '0.75rem', right: '0.75rem',
         width: 26, height: 26, borderRadius: '50%',
-        backgroundColor: 'rgba(255,255,255,0.08)', border: 'none',
-        color: 'rgba(255,255,255,0.5)', cursor: 'pointer',
+        backgroundColor: 'var(--gray-light)', border: 'none',
+        color: 'var(--gray)', cursor: 'pointer',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         transition: 'background 0.15s',
       }}>
@@ -45,7 +39,7 @@ export default function WelcomeCard() {
 
       <h3 style={{
         fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800,
-        fontSize: '1.125rem', color: '#FFFFFF', paddingRight: '2rem', marginBottom: '0.875rem',
+        fontSize: '1.125rem', color: 'var(--navy)', paddingRight: '2rem', marginBottom: '0.875rem',
       }}>
         You&apos;re all set — here&apos;s how to get started
       </h3>
@@ -59,11 +53,11 @@ export default function WelcomeCard() {
           <div key={i} style={{ display: 'flex', gap: '0.625rem', alignItems: 'flex-start' }}>
             <div style={{
               width: 26, height: 26, borderRadius: 6,
-              backgroundColor: 'rgba(255,255,255,0.08)',
+              backgroundColor: 'var(--gold-pale)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: 13, flexShrink: 0,
             }}>{row.emoji}</div>
-            <span style={{ fontSize: '0.8125rem', color: 'rgba(255,255,255,0.7)', lineHeight: 1.5 }}>
+            <span style={{ fontSize: '0.8125rem', color: 'var(--gray)', lineHeight: 1.5 }}>
               {row.text}
             </span>
           </div>

@@ -12,7 +12,7 @@ import CopyButton from '@/components/CopyButton'
 const services: { value: ServiceType; label: string }[] = [
   { value: 'junk-removal', label: 'Junk Removal' },
   { value: 'demolition', label: 'Light Demo' },
-  { value: 'trailer-rental', label: 'Trailer Rental' },
+
 ]
 
 function ToggleGroup({ options, value, onChange }: {

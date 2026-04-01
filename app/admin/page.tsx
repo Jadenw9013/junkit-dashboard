@@ -5,13 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Download, RefreshCw, Eye, LogOut } from 'lucide-react'
 import { getAdminData, getPromptPreview } from '@/app/actions/admin'
-import { AuditEntry, FeedbackEntry } from '@/lib/types'
+import { AuditEntry, FeedbackEntry, AutomationLogEntry } from '@/lib/types'
+import type { AutomationConfigResult } from '@/lib/validateEnv'
 
 export default function AdminDashboard() {
   const router = useRouter()
   const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([])
   const [feedbackEntries, setFeedbackEntries] = useState<FeedbackEntry[]>([])
   const [health, setHealth] = useState<Awaited<ReturnType<typeof getAdminData>>['health'] | null>(null)
+  const [automationLogs, setAutomationLogs] = useState<AutomationLogEntry[]>([])
+  const [automationConfig, setAutomationConfig] = useState<AutomationConfigResult | null>(null)
   const [loading, setLoading] = useState(true)
 
   // Prompt inspector
@@ -25,6 +28,8 @@ export default function AdminDashboard() {
     setAuditEntries(data.auditEntries)
     setFeedbackEntries(data.feedbackEntries)
     setHealth(data.health)
+    setAutomationLogs(data.automationLogs)
+    setAutomationConfig(data.automationConfig)
     setLoading(false)
   }
 
@@ -232,7 +237,38 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* Panel 4 — Prompt Inspector */}
+          {/* Panel 4 — Automation Config */}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
+            <h2 className="font-semibold text-gray-800 mb-3">Automation Config</h2>
+            {automationConfig && (
+              <div>
+                <div className={`text-sm font-semibold mb-3 px-2 py-1 rounded ${automationConfig.ready ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+                  {automationConfig.configured.length} of {automationConfig.total} automation services active
+                </div>
+                <div className="grid gap-1">
+                  {automationConfig.configured.map((v) => (
+                    <div key={v.key} className="flex justify-between py-1 text-sm">
+                      <span className="text-gray-600">{v.label}</span>
+                      <span className="text-green-600 font-medium">configured ✓</span>
+                    </div>
+                  ))}
+                  {automationConfig.missing.map((v) => (
+                    <div key={v.key} className="flex justify-between py-1 text-sm">
+                      <span className="text-gray-600">{v.label}</span>
+                      <span className="text-amber-600 font-medium">placeholder ⚠</span>
+                    </div>
+                  ))}
+                </div>
+                {!automationConfig.ready && (
+                  <div className="mt-3 p-2 rounded-lg bg-amber-50 border border-amber-200">
+                    <p className="text-xs text-amber-800">⚠ Replace placeholder values in .env.local with real API keys to enable automations.</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Panel 5 — Prompt Inspector */}
           <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 col-span-1 lg:col-span-2">
             <h2 className="font-semibold text-gray-800 mb-3">Prompt Inspector</h2>
             <div className="flex items-center gap-2 mb-3">
@@ -257,6 +293,55 @@ export default function AdminDashboard() {
                 {promptText}
               </pre>
             )}
+          </div>
+
+          {/* Panel 6 — Automation Log */}
+          <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 col-span-1 lg:col-span-2">
+            <h2 className="font-semibold text-gray-800 mb-3">Automation Log</h2>
+            {(() => {
+              const total = automationLogs.length
+              const successes = automationLogs.filter(l => l.success).length
+              const fallbacks = automationLogs.filter(l => l.fallbackUsed).length
+              const failures = automationLogs.filter(l => !l.success).length
+              return (
+                <div className="flex gap-4 mb-3 text-sm">
+                  <span className="text-gray-500">Total: <strong className="text-gray-800">{total}</strong></span>
+                  <span className="text-green-600">Success: <strong>{successes}</strong></span>
+                  <span className="text-amber-600">Fallback: <strong>{fallbacks}</strong></span>
+                  <span className="text-red-600">Failed: <strong>{failures}</strong></span>
+                </div>
+              )
+            })()}
+            <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-gray-500 border-b">
+                    <th className="text-left py-2 pr-2">Timestamp</th>
+                    <th className="text-left py-2 pr-2">Trigger</th>
+                    <th className="text-left py-2 pr-2">Action</th>
+                    <th className="text-left py-2 pr-2">Recipient</th>
+                    <th className="text-center py-2 pr-2">Success</th>
+                    <th className="text-center py-2">Fallback</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {automationLogs.length === 0 ? (
+                    <tr><td colSpan={6} className="py-6 text-center text-gray-400">No automation activity yet</td></tr>
+                  ) : automationLogs.map((l) => (
+                    <tr key={l.id} className={`border-b ${
+                      !l.success ? 'bg-red-50' : l.fallbackUsed ? 'bg-amber-50' : ''
+                    }`}>
+                      <td className="py-1.5 pr-2 text-gray-500">{new Date(l.timestamp).toLocaleString()}</td>
+                      <td className="py-1.5 pr-2 font-medium">{l.trigger}</td>
+                      <td className="py-1.5 pr-2 max-w-[200px] truncate">{l.action}</td>
+                      <td className="py-1.5 pr-2 text-gray-500">{l.recipient ? `···${l.recipient}` : '—'}</td>
+                      <td className="py-1.5 pr-2 text-center">{l.success ? '✓' : '✗'}</td>
+                      <td className="py-1.5 text-center">{l.fallbackUsed ? '⚠' : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

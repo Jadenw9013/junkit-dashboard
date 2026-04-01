@@ -12,7 +12,7 @@ export const DEFAULT_SETTINGS: Settings = {
     { id: 'half', label: 'Half truck load', min: 200, max: 280, notes: '' },
     { id: 'full', label: 'Full truck load', min: 380, max: 480, notes: '' },
     { id: 'demo', label: 'Light demolition', min: 250, max: 600, notes: 'Scope dependent' },
-    { id: 'trailer', label: 'Trailer rental', min: 75, max: 120, notes: 'Per day' },
+
     { id: 'appliance', label: 'Appliance surcharge', min: 40, max: 60, notes: 'Per item' },
     { id: 'hottub', label: 'Hot tub surcharge', min: 75, max: 150, notes: '' },
   ],

@@ -55,7 +55,7 @@ export default function JobDonePage() {
               className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle}>
               <option value="junk-removal">Junk Removal</option>
               <option value="demolition">Light Demolition</option>
-              <option value="trailer-rental">Trailer Rental</option>
+
             </select>
             <input type="number" placeholder="Final price charged ($)" value={form.price || ''}
               onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}

@@ -77,5 +77,20 @@ export async function POST(request: NextRequest) {
     })
   }
 
+  // Fire automation in background — don't await to keep webhook fast
+  try {
+    const { runNewLeadAutomation } = await import('@/lib/automations/newLead')
+    runNewLeadAutomation({
+      jobId: job.id,
+      customerName: body.customerName ?? 'Unknown',
+      phone: body.phone ?? '',
+      service: body.service ?? 'unknown',
+      city: body.city ?? '',
+      description: body.description ?? '',
+    }).catch((e: unknown) => console.log('[AUTOMATION] New lead automation error:', e))
+  } catch (e) {
+    console.log('[AUTOMATION] Could not load automation module:', e)
+  }
+
   return NextResponse.json({ success: true, jobId: job.id })
 }
