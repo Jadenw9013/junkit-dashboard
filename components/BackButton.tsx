@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { ChevronLeft } from 'lucide-react'
 
 interface BackButtonProps {
   href: string
@@ -10,10 +10,9 @@ export default function BackButton({ href, label = 'Back' }: BackButtonProps) {
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1.5 text-sm transition-opacity hover:opacity-80"
-      style={{ color: '#6B7280' }}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: '0.875rem', fontWeight: 600, color: 'var(--gray)', textDecoration: 'none', transition: 'color 0.15s' }}
     >
-      <ArrowLeft size={16} />
+      <ChevronLeft size={16} />
       <span>{label}</span>
     </Link>
   )

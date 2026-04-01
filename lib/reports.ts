@@ -14,7 +14,6 @@ export interface MonthlyReport {
     avgJobValue: number
     newCustomers: number
     returningCustomers: number
-    reviewRequestsSent: number
     leadsReceived: number
     leadsConverted: number
     conversionRate: number
@@ -63,7 +62,7 @@ export function emptyReport(year: number, month: number): MonthlyReport {
     summary: {
       totalJobs: 0, totalRevenue: 0, avgJobValue: 0,
       newCustomers: 0, returningCustomers: 0,
-      reviewRequestsSent: 0, leadsReceived: 0,
+      leadsReceived: 0,
       leadsConverted: 0, conversionRate: 0,
     },
     byService: [],
@@ -91,7 +90,6 @@ export async function generateMonthlyReport(year: number, month: number): Promis
 
   const leads = monthJobs.filter((j) => j.status === 'lead')
   const completed = monthJobs.filter((j) => j.status === 'completed' || j.status === 'reviewed')
-  const reviewsSent = monthJobs.filter((j) => j.reviewRequestSMS).length
 
   // New vs returning customers this month
   const monthStart = new Date(year, month - 1, 1)
@@ -172,7 +170,6 @@ export async function generateMonthlyReport(year: number, month: number): Promis
       avgJobValue,
       newCustomers: newCustomers.length,
       returningCustomers: returningThisMonth.length,
-      reviewRequestsSent: reviewsSent,
       leadsReceived: leads.length,
       leadsConverted: completed.length,
       conversionRate,

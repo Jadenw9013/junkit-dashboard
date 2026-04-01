@@ -89,13 +89,7 @@ verbalQuote is a single sentence the owner reads aloud to the customer.
 flags are any complications worth noting.
 Use the pricing from the business context above.`,
 
-    jobdone: `${context}
-
-Write a review request SMS for ${settings.businessName}, a local junk removal business.
-Use the customer's first name. Reference the specific service.
-Be warm and genuine — sound like a real person, not a template.
-Keep it under 160 characters.
-End with this exact link: ${settings.googleReviewLink}`,
+    jobdone: `Job logging tool — no AI prompt. Saves job directly to database.`,
 
     message: `${context}
 

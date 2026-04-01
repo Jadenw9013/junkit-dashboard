@@ -14,5 +14,6 @@ export async function quickLogJob(data: {
     city: data.city,
     service: data.service,
     status: 'lead',
+    source: 'manual',
   })
 }

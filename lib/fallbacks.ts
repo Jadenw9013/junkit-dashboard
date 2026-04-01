@@ -16,8 +16,6 @@ const FALLBACKS = {
     flags: ['Contact owner for exact pricing'],
     confidence: 'low' as QuoteResult['confidence'],
   },
-  reviewSMS:
-    "Thanks so much for choosing Junk It! If you have a moment, we'd really appreciate a Google review — it means the world to us. – Junk It",
   message:
     "Hi! Just checking in from Junk It. Let us know if you need anything hauled — we have same-day availability most days.",
 }

@@ -8,7 +8,6 @@ export async function saveBusinessInfo(data: {
   businessName: string
   ownerName: string
   phone: string
-  googleReviewLink: string
 }) {
   const settings = await readSettings()
   await writeSettings({ ...settings, ...data })

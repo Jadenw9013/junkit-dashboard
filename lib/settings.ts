@@ -7,7 +7,6 @@ export const DEFAULT_SETTINGS: Settings = {
   businessName: 'Junk It',
   ownerName: 'Owner',
   phone: '(425) 000-0000',
-  googleReviewLink: 'https://g.page/r/YOUR_REVIEW_LINK',
   pricing: [
     { id: 'quarter', label: 'Quarter truck load', min: 100, max: 150, notes: '' },
     { id: 'half', label: 'Half truck load', min: 200, max: 280, notes: '' },
@@ -82,9 +81,7 @@ export function validateSettings(settings: Partial<Settings>): { valid: boolean;
     if (phoneDigits.length < 7 || phoneDigits.length > 15) errors.push('Phone number looks invalid')
   }
 
-  if (settings.googleReviewLink !== undefined && settings.googleReviewLink.trim()) {
-    if (!settings.googleReviewLink.startsWith('https://')) errors.push('Google review link must start with https://')
-  }
+
 
   if (settings.pricing) {
     for (const item of settings.pricing) {

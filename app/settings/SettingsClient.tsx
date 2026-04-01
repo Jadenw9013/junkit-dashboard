@@ -81,8 +81,11 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
 
   // Pricing edit state
   const [pricing, setPricing] = useState<PricingItem[]>(initialSettings.pricing)
+  const [savedPricing, setSavedPricing] = useState<PricingItem[]>(initialSettings.pricing)
   const [newPriceRow, setNewPriceRow] = useState<Partial<PricingItem> & { label: string }>({ label: '', min: 0, max: 0, notes: '' })
   const [showAddPrice, setShowAddPrice] = useState(false)
+  const [pricingChanges, setPricingChanges] = useState<{ label: string; oldMin: number; oldMax: number; newMin: number; newMax: number }[]>([])
+  const [showPricingConfirm, setShowPricingConfirm] = useState(false)
 
   // Service area
   const [cities, setCities] = useState<string[]>(initialSettings.serviceArea)
@@ -108,7 +111,6 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
     businessName: initialSettings.businessName,
     ownerName: initialSettings.ownerName,
     phone: initialSettings.phone,
-    googleReviewLink: initialSettings.googleReviewLink,
   })
 
   function setL(key: string, val: boolean) { setLoading((l) => ({ ...l, [key]: val })) }
@@ -120,11 +122,35 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
     setL('biz', false)
   }
 
-  async function handleSavePricing() {
+  function handleSavePricingClick() {
+    // Compare to find changes
+    const changes = pricing.filter(item => {
+      const old = savedPricing.find(o => o.id === item.id)
+      return old && (old.min !== item.min || old.max !== item.max)
+    }).map(item => {
+      const old = savedPricing.find(o => o.id === item.id)!
+      return { label: item.label, oldMin: old.min, oldMax: old.max, newMin: item.min, newMax: item.max }
+    })
+    if (changes.length > 0) {
+      setPricingChanges(changes)
+      setShowPricingConfirm(true)
+    } else {
+      confirmSavePricing()
+    }
+  }
+
+  async function confirmSavePricing() {
+    setShowPricingConfirm(false)
     setL('pricing', true)
-    try { await savePricing(pricing); toast.success('Pricing saved') }
+    try { await savePricing(pricing); setSavedPricing([...pricing]); toast.success('Pricing saved') }
     catch { toast.error('Failed to save') }
     setL('pricing', false)
+  }
+
+  function cancelPricingChanges() {
+    setPricing([...savedPricing])
+    setShowPricingConfirm(false)
+    setPricingChanges([])
   }
 
   async function handleSaveArea() {
@@ -231,7 +257,6 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
               { key: 'businessName' as const, label: 'Business name', helper: '' },
               { key: 'ownerName' as const, label: 'Owner name', helper: 'Used to personalize AI sign-offs' },
               { key: 'phone' as const, label: 'Phone number', helper: 'Included in email responses' },
-              { key: 'googleReviewLink' as const, label: 'Google Review Link', helper: 'Paste your Google review URL here' },
             ].map(({ key, label, helper }) => (
               <div key={key} className="mb-3">
                 <FieldLabel helper={helper || undefined}>{label}</FieldLabel>
@@ -291,7 +316,31 @@ export default function SettingsClient({ initialSettings, initialHistory }: Prop
                 <button onClick={addPriceRow} className="col-span-4 text-xs py-1.5 rounded-lg font-medium" style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>Add</button>
               </div>
             )}
-            <SaveButton onClick={handleSavePricing} loading={!!loading.pricing} label="Save Pricing" />
+            {showPricingConfirm && pricingChanges.length > 0 && (
+              <div className="rounded-lg p-3 mt-3" style={{ backgroundColor: 'rgba(245,197,24,0.08)', border: '1px solid rgba(245,197,24,0.2)' }}>
+                <p className="text-xs font-semibold mb-2" style={{ color: '#2D2D2D' }}>Review your changes:</p>
+                {pricingChanges.map((c, i) => (
+                  <p key={i} className="text-xs mb-1" style={{ color: '#6B7280' }}>
+                    {c.label}: ${c.oldMin}–${c.oldMax} → ${c.newMin}–${c.newMax}
+                  </p>
+                ))}
+                <div className="flex gap-2 mt-3">
+                  <button onClick={confirmSavePricing} disabled={!!loading.pricing}
+                    className="flex-1 py-2 rounded-lg text-xs font-semibold disabled:opacity-50"
+                    style={{ backgroundColor: '#F5C518', color: '#2D2D2D' }}>
+                    {loading.pricing ? 'Saving...' : 'Confirm changes'}
+                  </button>
+                  <button onClick={cancelPricingChanges}
+                    className="flex-1 py-2 rounded-lg text-xs"
+                    style={{ backgroundColor: 'rgba(0,0,0,0.06)', color: '#6B7280' }}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+            {!showPricingConfirm && (
+              <SaveButton onClick={handleSavePricingClick} loading={!!loading.pricing} label="Save Pricing" />
+            )}
           </SectionCard>
 
           {/* Service Area */}

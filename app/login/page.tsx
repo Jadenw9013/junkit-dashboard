@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle } from 'lucide-react'
+import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -86,6 +87,9 @@ export default function LoginPage() {
             {loading ? 'Checking...' : 'Enter'}
           </button>
         </form>
+        <div className="text-center mt-3">
+          <Link href="/login/recover" className="text-xs" style={{ color: '#6B7280' }}>Forgot password?</Link>
+        </div>
       </div>
     </div>
   )

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Barlow_Condensed, Barlow } from 'next/font/google'
 import { Toaster } from '@/components/ui/sonner'
+import OfflineDetector from '@/components/OfflineDetector'
 import './globals.css'
 
 const barlowCondensed = Barlow_Condensed({
@@ -12,7 +13,7 @@ const barlowCondensed = Barlow_Condensed({
 const barlow = Barlow({
   variable: '--font-barlow',
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '500', '600', '700'],
 })
 
 export const metadata: Metadata = {
@@ -35,7 +36,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#F7F6F1',
+  themeColor: '#F5F3EE',
 }
 
 export default function RootLayout({
@@ -48,7 +49,8 @@ export default function RootLayout({
       lang="en"
       className={`${barlowCondensed.variable} ${barlow.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col" style={{ backgroundColor: '#F7F6F1', color: '#2D2D2D' }}>
+      <body className="min-h-full flex flex-col" style={{ backgroundColor: 'var(--bg)', color: 'var(--navy)' }}>
+        <OfflineDetector />
         {children}
         <Toaster richColors position="top-center" />
       </body>

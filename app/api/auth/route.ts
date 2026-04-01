@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSession, deleteSession } from '@/lib/sessions'
 import { checkLockout, recordFailedAttempt, recordSuccessfulLogin } from '@/lib/loginAttempts'
+import { getPasswordOverride } from '@/lib/recovery'
 
 export async function POST(request: NextRequest) {
   const ip =
@@ -20,7 +21,10 @@ export async function POST(request: NextRequest) {
   const body = await request.json()
   const { password } = body
 
-  if (!password || password !== process.env.DASHBOARD_PASSWORD) {
+  const override = await getPasswordOverride()
+  const validPassword = override || process.env.DASHBOARD_PASSWORD
+
+  if (!password || password !== validPassword) {
     const { attempts } = await recordFailedAttempt(ip)
     const remaining = Math.max(0, 5 - attempts)
     return NextResponse.json({ success: false, attemptsRemaining: remaining }, { status: 401 })

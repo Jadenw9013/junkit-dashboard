@@ -61,3 +61,11 @@ export async function getUnreadLeadCount(): Promise<number> {
   const jobs = await readJobs()
   return jobs.filter((j) => j.status === 'lead' && !j.aiDraftSMS).length
 }
+
+export async function getLastIncomingLeadDate(): Promise<string | null> {
+  const jobs = await readJobs()
+  const webhookJobs = jobs.filter((j) => j.source === 'webhook')
+  if (webhookJobs.length === 0) return null
+  webhookJobs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return webhookJobs[0].createdAt
+}

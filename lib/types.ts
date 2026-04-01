@@ -14,7 +14,7 @@ export interface Job {
   status: JobStatus
   aiDraftSMS?: string
   aiDraftEmail?: string
-  reviewRequestSMS?: string
+  source?: 'webhook' | 'manual'
 }
 
 export interface PricingItem {
@@ -39,7 +39,6 @@ export interface Settings {
   businessName: string
   ownerName: string
   phone: string
-  googleReviewLink: string
   pricing: PricingItem[]
   serviceArea: string[]
   acceptedItems: string[]
@@ -50,6 +49,7 @@ export interface Settings {
   responseLength: 'brief' | 'standard' | 'detailed'
   includePricingInFirstResponse: boolean
   onboardingComplete: boolean
+  onboardingSkipped?: boolean
   version: number
   updatedAt: string
 }

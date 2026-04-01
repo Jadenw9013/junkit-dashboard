@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Printer, BarChart3 } from 'lucide-react'
 import { getReport } from '@/app/actions/report'
-import { MonthlyReport } from '@/lib/reports'
+import type { MonthlyReport } from '@/lib/reports'
 import BackButton from '@/components/BackButton'
 
 const serviceLabels: Record<string, string> = {
@@ -18,6 +18,20 @@ const statusColors: Record<string, { bg: string; text: string }> = {
   quoted: { bg: 'rgba(251,191,36,0.15)', text: '#fbbf24' },
   completed: { bg: 'rgba(74,222,128,0.15)', text: '#4ade80' },
   reviewed: { bg: 'rgba(0,0,0,0.15)', text: '#F5C518' },
+}
+
+function plainSummary(report: MonthlyReport): string {
+  const s = report.summary
+  if (s.totalJobs === 0) return `No completed jobs logged in ${report.month}. Use Job Done after each job to track revenue here.`
+  const parts: string[] = []
+  parts.push(`In ${report.month}, you completed ${s.totalJobs} ${s.totalJobs === 1 ? 'job' : 'jobs'} and brought in $${s.totalRevenue.toLocaleString()}.`)
+  if (s.avgJobValue > 0) parts.push(`Your average job was worth $${s.avgJobValue.toLocaleString()}.`)
+  if (s.returningCustomers > 0) parts.push(`${s.returningCustomers} ${s.returningCustomers === 1 ? 'customer' : 'customers'} came back for another job.`)
+  if (report.byService.length > 0) {
+    const top = report.byService[0]
+    parts.push(`Your busiest service was ${serviceLabels[top.service] || top.service} with ${top.count} ${top.count === 1 ? 'job' : 'jobs'}.`)
+  }
+  return parts.join(' ')
 }
 
 export default function ReportPage() {
@@ -103,6 +117,13 @@ export default function ReportPage() {
                   <p className="text-xs" style={{ color: '#6B7280' }}>{item.label}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Plain Language Summary */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.08)' }}>
+              <p className="text-sm leading-relaxed" style={{ color: '#2D2D2D' }}>
+                {plainSummary(report)}
+              </p>
             </div>
 
             {/* By Service */}

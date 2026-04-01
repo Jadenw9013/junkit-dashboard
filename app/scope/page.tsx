@@ -1,37 +1,46 @@
 'use client'
 
 import { useState } from 'react'
-import { AlertTriangle, Clock } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { generateQuote, saveQuotedJob, ScopeInput, QuoteResult } from '@/app/actions/scope'
 import { ServiceType } from '@/lib/types'
-import BackButton from '@/components/BackButton'
 import FallbackBanner from '@/components/FallbackBanner'
-import FeedbackWidget from '@/components/FeedbackWidget'
+import AIDraftNotice from '@/components/AIDraftNotice'
 import CopyButton from '@/components/CopyButton'
 
-function ToggleButtons({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
+const services: { value: ServiceType; label: string }[] = [
+  { value: 'junk-removal', label: 'Junk Removal' },
+  { value: 'demolition', label: 'Light Demo' },
+  { value: 'trailer-rental', label: 'Trailer Rental' },
+]
+
+function ToggleGroup({ options, value, onChange }: {
+  options: { value: string; label: string }[]
+  value: string | boolean
+  onChange: (v: string | boolean) => void
+}) {
   return (
-    <div className="flex gap-2">
-      {[{ label: 'No', val: false }, { label: 'Yes', val: true }].map(({ label, val }) => (
-        <button key={label} type="button" onClick={() => onChange(val)}
-          className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-          style={{
-            backgroundColor: value === val ? (val ? 'rgba(0,0,0,0.25)' : '#FFFFFF') : '#F7F6F1',
-            border: value === val ? `1px solid ${val ? '#F5C518' : 'rgba(0,0,0,0.4)'}` : '1px solid rgba(0,0,0,0.15)',
-            color: value === val ? '#2D2D2D' : '#6B7280',
-          }}>
-          {label}
-        </button>
-      ))}
+    <div style={{ display: 'flex', gap: 4 }}>
+      {options.map((opt) => {
+        const isActive = value === opt.value || value === (opt.value === 'true')
+        return (
+          <button key={opt.value} type="button"
+            onClick={() => onChange(typeof value === 'boolean' ? opt.value === 'true' : opt.value)}
+            style={{
+              padding: '0.4375rem 0.9375rem', borderRadius: 7,
+              fontSize: '0.8125rem', fontWeight: 600,
+              border: isActive ? '1.5px solid var(--navy)' : '1.5px solid var(--border-med)',
+              backgroundColor: isActive ? 'var(--navy)' : 'var(--surface)',
+              color: isActive ? '#FFFFFF' : 'var(--gray)',
+              cursor: 'pointer', transition: 'all 0.15s',
+            }}>
+            {opt.label}
+          </button>
+        )
+      })}
     </div>
   )
-}
-
-const inputStyle = {
-  backgroundColor: '#FFFFFF',
-  border: '1px solid rgba(0,0,0,0.3)',
-  color: '#2D2D2D',
 }
 
 export default function ScopePage() {
@@ -70,129 +79,232 @@ export default function ScopePage() {
     setSaving(false)
   }
 
-  const confidenceColor = { high: '#4ade80', medium: '#fcd34d', low: '#f87171' }
-  const truckLabels = { quarter: 'Quarter Truck', half: 'Half Truck', full: 'Full Truck' }
+  const confidenceColors: Record<string, { color: string; bg: string }> = {
+    high: { color: 'var(--green)', bg: 'var(--green-bg)' },
+    medium: { color: 'var(--gold)', bg: 'var(--gold-pale)' },
+    low: { color: 'var(--red)', bg: 'var(--red-bg)' },
+  }
+  const truckLabels: Record<string, string> = { quarter: 'Quarter Truck', half: 'Half Truck', full: 'Full Truck' }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F7F6F1' }}>
-      <div className="mx-auto max-w-[430px] px-4 pb-8">
-        <div className="flex items-center gap-3 py-5">
-          <BackButton href="/" />
-          <div>
-            <h1 className="text-xl font-bold" style={{ color: '#2D2D2D' }}>Scope a Job</h1>
-            <p className="text-xs" style={{ color: '#6B7280' }}>Fill in what the customer told you — get a quote in seconds</p>
-          </div>
+    <div style={{ display: 'flex', minHeight: '100vh' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg)' }}>
+        {/* Topbar */}
+        <div style={{
+          backgroundColor: 'var(--surface)', borderBottom: '1px solid var(--border)',
+          height: 58, padding: '0 1.75rem',
+          display: 'flex', alignItems: 'center',
+          position: 'sticky', top: 0, zIndex: 10,
+        }}>
+          <h1 style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '1.375rem', color: 'var(--navy)' }}>
+            Scope a Job
+          </h1>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <input type="text" placeholder="Customer name" value={form.customerName}
-              onChange={(e) => setForm({ ...form, customerName: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle} />
-            <input type="text" placeholder="City" value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle} />
-            <select value={form.service} onChange={(e) => setForm({ ...form, service: e.target.value as ServiceType })}
-              className="w-full px-4 py-3 rounded-xl text-sm outline-none" style={inputStyle}>
-              <option value="junk-removal">Junk Removal</option>
-              <option value="demolition">Light Demolition</option>
-              <option value="trailer-rental">Trailer Rental</option>
-            </select>
-            <textarea rows={4} placeholder="What needs to go? Describe size and items" value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl text-sm resize-none outline-none" style={inputStyle} />
-          </div>
+        {/* Content */}
+        <div style={{ padding: '1.5rem 1.75rem', maxWidth: 900 }}>
+          <p style={{ fontSize: '0.9rem', color: 'var(--gray)', marginBottom: '1.25rem' }}>
+            Fill in what the customer told you — get a quote to read on the phone in seconds.
+          </p>
 
-          <div className="space-y-3">
-            {[
-              { key: 'appliances' as const, label: 'Appliances included?' },
-              { key: 'difficultAccess' as const, label: 'Difficult access?', sub: 'stairs, narrow gate, long carry distance' },
-              { key: 'demoRequired' as const, label: 'Demo required?' },
-            ].map(({ key, label, sub }) => (
-              <div key={key}>
-                <label className="text-sm font-medium mb-1 block" style={{ color: '#2D2D2D' }}>{label}</label>
-                {sub && <p className="text-xs mb-2" style={{ color: '#6B7280' }}>{sub}</p>}
-                <ToggleButtons value={form[key]} onChange={(v) => setForm({ ...form, [key]: v })} />
+          {/* Input Card */}
+          <div style={{
+            backgroundColor: 'var(--surface)', border: '1px solid var(--border)',
+            borderRadius: 'var(--r-lg)', boxShadow: 'var(--shadow-sm)',
+            padding: '1.5rem', marginBottom: '1rem',
+          }}>
+            {/* Name + City row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.125rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.375rem' }}>Customer name</label>
+                <input type="text" placeholder="e.g. John Smith" value={form.customerName}
+                  onChange={(e) => setForm({ ...form, customerName: e.target.value })}
+                  style={{
+                    width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--r)',
+                    border: '1.5px solid var(--border-med)', backgroundColor: 'var(--surface)',
+                    fontSize: '0.9375rem', color: 'var(--navy)', outline: 'none',
+                  }} />
               </div>
-            ))}
-          </div>
-
-          <button onClick={handleGenerate} disabled={loading || !form.description.trim()}
-            className="w-full py-3 rounded-xl font-semibold text-sm transition-opacity disabled:opacity-50"
-            style={{ backgroundColor: '#F5C518', color: '#F7F6F1' }}>
-            {loading ? 'Generating Quote...' : 'Generate Quote'}
-          </button>
-        </div>
-
-        {rateLimited && (
-          <div className="mt-4 rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.3)' }}>
-            <Clock size={20} style={{ color: '#fbbf24' }} />
-            <div>
-              <p className="text-sm font-semibold" style={{ color: '#fbbf24' }}>Too many requests</p>
-              <p className="text-xs" style={{ color: '#6B7280' }}>Try again in a few minutes.</p>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.375rem' }}>City</label>
+                <input type="text" placeholder="e.g. Kirkland" value={form.city}
+                  onChange={(e) => setForm({ ...form, city: e.target.value })}
+                  style={{
+                    width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--r)',
+                    border: '1.5px solid var(--border-med)', backgroundColor: 'var(--surface)',
+                    fontSize: '0.9375rem', color: 'var(--navy)', outline: 'none',
+                  }} />
+              </div>
             </div>
-          </div>
-        )}
 
-        {quote && (
-          <div className="mt-6 space-y-4">
-            {quote.usedFallback && <FallbackBanner />}
-            <div className="rounded-xl p-5" style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.4)' }}>
-              <div className="text-center mb-4">
-                <span className="text-4xl font-black" style={{ color: '#F5C518', fontFamily: 'var(--font-barlow-condensed, sans-serif)' }}>
-                  ${quote.priceMin} – ${quote.priceMax}
-                </span>
+            {/* Service Toggle */}
+            <div style={{ marginBottom: '1.125rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.375rem' }}>Service</label>
+              <ToggleGroup
+                options={services.map(s => ({ value: s.value, label: s.label }))}
+                value={form.service}
+                onChange={(v) => setForm({ ...form, service: v as ServiceType })}
+              />
+            </div>
+
+            {/* Description */}
+            <div style={{ marginBottom: '1.125rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.375rem' }}>What needs to go?</label>
+              <textarea
+                rows={3}
+                placeholder="e.g. 2 couches, old fridge, about 10 bags of misc stuff"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                style={{
+                  width: '100%', minHeight: 85, resize: 'none',
+                  padding: '0.75rem 1rem', borderRadius: 'var(--r)',
+                  border: '1.5px solid var(--border-med)', backgroundColor: 'var(--surface)',
+                  fontSize: '0.9375rem', color: 'var(--navy)', outline: 'none',
+                  fontFamily: 'inherit',
+                }}
+              />
+            </div>
+
+            {/* Three yes/no toggles */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.875rem', marginBottom: '1.25rem' }}>
+              {[
+                { key: 'appliances' as const, label: 'Appliances?' },
+                { key: 'difficultAccess' as const, label: 'Stairs / tight access?' },
+                { key: 'demoRequired' as const, label: 'Demo needed?' },
+              ].map(({ key, label }) => (
+                <div key={key}>
+                  <label style={{ display: 'block', fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.375rem' }}>{label}</label>
+                  <ToggleGroup
+                    options={[{ value: 'true', label: 'Yes' }, { value: 'false', label: 'No' }]}
+                    value={form[key]}
+                    onChange={(v) => setForm({ ...form, [key]: v === 'true' || v === true })}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Generate button */}
+            <button onClick={handleGenerate} disabled={loading || !form.description.trim()}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                backgroundColor: 'var(--navy)', color: '#FFFFFF',
+                borderRadius: 'var(--r)', border: 'none',
+                padding: '0.75rem', fontWeight: 700, fontSize: '0.9375rem',
+                cursor: loading || !form.description.trim() ? 'not-allowed' : 'pointer',
+                opacity: loading || !form.description.trim() ? 0.5 : 1,
+                transition: 'all 0.15s',
+              }}>
+              {loading ? 'Generating Quote...' : 'Generate Quote'}
+            </button>
+          </div>
+
+          {/* Rate Limited */}
+          {rateLimited && (
+            <div style={{
+              borderRadius: 'var(--r)', padding: '0.875rem 1rem',
+              backgroundColor: 'var(--amber-bg)', border: '1px solid rgba(146,64,14,0.12)',
+              display: 'flex', alignItems: 'center', gap: '0.75rem',
+              marginBottom: '1rem',
+            }}>
+              <Clock size={20} style={{ color: 'var(--amber)' }} />
+              <div>
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: 'var(--amber)' }}>Too many requests</p>
+                <p style={{ fontSize: '0.8125rem', color: 'var(--gray)' }}>Try again in a few minutes.</p>
               </div>
-              <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
-                <span className="text-xs px-3 py-1 rounded-full font-medium" style={{ backgroundColor: 'rgba(0,0,0,0.15)', color: '#E0B115' }}>
-                  {truckLabels[quote.truckSize]}
-                </span>
-                <span className="text-xs px-3 py-1 rounded-full font-medium" style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#6B7280' }}>
-                  {quote.timeEstimate}
-                </span>
-                <span className="text-xs px-3 py-1 rounded-full font-medium capitalize" style={{ backgroundColor: 'rgba(0,0,0,0.2)', color: confidenceColor[quote.confidence] }}>
-                  {quote.confidence} confidence
-                </span>
-              </div>
-              <div className="rounded-lg p-3 mb-3" style={{ backgroundColor: '#F7F6F1', border: '1px solid rgba(0,0,0,0.2)' }}>
-                <div className="flex items-start justify-between gap-2">
-                  <p className="text-sm leading-relaxed italic flex-1" style={{ color: '#2D2D2D' }}>
+            </div>
+          )}
+
+          {/* Quote Output */}
+          {quote && (
+            <div>
+              {quote.usedFallback && <FallbackBanner />}
+
+              <div style={{
+                backgroundColor: 'var(--surface)', border: '1px solid var(--border)',
+                borderRadius: 'var(--r-lg)', boxShadow: 'var(--shadow-sm)',
+                padding: '1.25rem', marginBottom: '1rem',
+              }}>
+                {/* Price */}
+                <div style={{ textAlign: 'center', marginBottom: '1.125rem' }}>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--gray)', marginBottom: 4 }}>
+                    ESTIMATED PRICE RANGE
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-barlow-condensed, sans-serif)', fontWeight: 800, fontSize: '3rem', lineHeight: 1, color: 'var(--navy)' }}>
+                    ${quote.priceMin}<span style={{ color: 'var(--gray)', fontSize: '2rem' }}> – </span>${quote.priceMax}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '3px 9px', borderRadius: 8, backgroundColor: 'var(--green-bg)', color: 'var(--green)' }}>
+                      {truckLabels[quote.truckSize]}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '3px 9px', borderRadius: 8, backgroundColor: 'var(--blue-bg)', color: 'var(--blue)' }}>
+                      {quote.timeEstimate}
+                    </span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '3px 9px', borderRadius: 8, backgroundColor: confidenceColors[quote.confidence]?.bg || 'var(--gold-pale)', color: confidenceColors[quote.confidence]?.color || 'var(--gold)', textTransform: 'capitalize' }}>
+                      {quote.confidence} confidence
+                    </span>
+                  </div>
+                </div>
+
+                {/* Verbal Quote Box */}
+                <div style={{
+                  backgroundColor: 'var(--bg)', border: '1.5px solid var(--border-med)',
+                  borderRadius: 'var(--r)', padding: '1rem', marginBottom: '1rem',
+                }}>
+                  <div style={{ fontSize: '0.6875rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--gray)', marginBottom: '0.375rem' }}>
+                    READ THIS TO THE CUSTOMER
+                  </div>
+                  <p style={{ fontSize: '0.9375rem', color: 'var(--navy)', lineHeight: 1.65, fontStyle: 'italic' }}>
                     &ldquo;{quote.verbalQuote}&rdquo;
                   </p>
-                  <CopyButton text={quote.verbalQuote}
-                    className="p-1.5 shrink-0 mt-0.5"
-                    style={{ backgroundColor: 'rgba(0,0,0,0.1)', color: '#F5C518' }} />
+                  <div style={{ marginTop: '0.75rem' }}>
+                    <CopyButton text={quote.verbalQuote} label="Copy quote" variant="outline" />
+                  </div>
                 </div>
-                <p className="text-xs mt-1" style={{ color: '#6B7280' }}>Read this aloud on the phone</p>
+
+                {/* Flags */}
+                {quote.flags && quote.flags.length > 0 && (
+                  <div style={{
+                    backgroundColor: 'var(--amber-bg)', borderRadius: 'var(--r)',
+                    padding: '0.75rem 1rem', marginBottom: '1rem',
+                    fontSize: '0.8125rem', color: 'var(--amber)',
+                  }}>
+                    <strong>Notes: </strong>{quote.flags.join(' · ')}
+                  </div>
+                )}
               </div>
-              {quote.flags && quote.flags.length > 0 && (
-                <div className="space-y-1.5">
-                  {quote.flags.map((flag, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <AlertTriangle size={13} style={{ color: '#fcd34d', flexShrink: 0 }} />
-                      <span className="text-xs" style={{ color: '#fcd34d' }}>{flag}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
 
-            <FeedbackWidget tool="scope" outputSummary={quote.verbalQuote.slice(0, 100)} />
+              {/* AI Draft Notice */}
+              <AIDraftNotice tool="scope" />
 
-            <div className="grid grid-cols-2 gap-3">
-              <button onClick={() => handleSave('lead')} disabled={saving}
-                className="py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
-                style={{ backgroundColor: 'rgba(59,130,246,0.1)', border: '1px solid rgba(59,130,246,0.3)', color: '#93c5fd' }}>
-                {saving ? 'Saving...' : 'Save as Lead'}
-              </button>
-              <button onClick={() => handleSave('quoted')} disabled={saving}
-                className="py-3 rounded-xl font-semibold text-sm disabled:opacity-50"
-                style={{ backgroundColor: 'rgba(0,0,0,0.1)', border: '1px solid rgba(0,0,0,0.3)', color: '#F5C518' }}>
-                {saving ? 'Saving...' : 'Save as Quoted'}
-              </button>
+              {/* Divider */}
+              <div style={{ height: 1, backgroundColor: 'var(--border)', margin: '1.125rem 0' }} />
+
+              {/* Save buttons */}
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button onClick={() => handleSave('lead')} disabled={saving}
+                  style={{
+                    backgroundColor: 'transparent', border: '1.5px solid var(--border-med)',
+                    color: 'var(--navy)', borderRadius: 'var(--r)',
+                    padding: '0.5rem 1rem', fontWeight: 700, fontSize: '0.8125rem',
+                    cursor: 'pointer', opacity: saving ? 0.5 : 1,
+                    transition: 'all 0.15s',
+                  }}>
+                  {saving ? 'Saving...' : 'Save as Lead'}
+                </button>
+                <button onClick={() => handleSave('quoted')} disabled={saving}
+                  style={{
+                    backgroundColor: 'var(--navy)', border: 'none',
+                    color: '#FFFFFF', borderRadius: 'var(--r)',
+                    padding: '0.5rem 1rem', fontWeight: 700, fontSize: '0.8125rem',
+                    cursor: 'pointer', opacity: saving ? 0.5 : 1,
+                    transition: 'all 0.15s',
+                  }}>
+                  {saving ? 'Saving...' : 'Save as Quoted'}
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

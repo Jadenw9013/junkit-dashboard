@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { generateReEngagement, generateFollowUp, generateCustomMessage } from '@/app/actions/message'
 import BackButton from '@/components/BackButton'
 import FallbackBanner from '@/components/FallbackBanner'
-import FeedbackWidget from '@/components/FeedbackWidget'
+import AIDraftNotice from '@/components/AIDraftNotice'
 import { Suspense } from 'react'
 
 type Tab = 're-engagement' | 'follow-up' | 'custom'
@@ -157,7 +157,8 @@ function MessagePageInner() {
               </div>
               <p className="text-xs mt-2" style={{ color: '#6B7280' }}>{result.text.length} characters</p>
             </div>
-            <FeedbackWidget tool="message" outputSummary={result.text.slice(0, 100)} />
+            <AIDraftNotice tool="message" />
+            {/* Feedback widget removed from owner UI — feedback data still collected via admin panel */}
           </div>
         )}
       </div>

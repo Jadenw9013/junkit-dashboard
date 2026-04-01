@@ -5,49 +5,65 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --cream: #F7F6F1;
-  --white: #FFFFFF;
-  --charcoal: #2D2D2D;
-  --gray: #6B7280;
-  --gray-light: #9CA3AF;
-  --gold: #F5C518;
-  --gold-hover: #E0B115;
-  --gold-muted: rgba(245, 197, 24, 0.12);
-  --border-light: rgba(0, 0, 0, 0.08);
-  --border-medium: rgba(0, 0, 0, 0.12);
+  --bg: #F5F3EE;
+  --surface: #FFFFFF;
+  --navy: #1C2B3A;
+  --navy-mid: #2D3F52;
+  --gold: #C8960C;
+  --gold-light: #F5C518;
+  --gold-pale: #FFFBEA;
+  --gold-border: rgba(200,150,12,0.2);
+  --green: #16692F;
+  --green-bg: #ECFDF3;
+  --amber: #92400E;
+  --amber-bg: #FFFBEB;
+  --red: #991B1B;
+  --red-bg: #FEF2F2;
+  --blue: #1E40AF;
+  --blue-bg: #EFF6FF;
+  --gray: #64748B;
+  --gray-light: #F1F5F9;
+  --border: rgba(0,0,0,0.07);
+  --border-med: rgba(0,0,0,0.12);
+  --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --r: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
 
-  --background: #F7F6F1;
-  --foreground: #2D2D2D;
-  --card: #FFFFFF;
-  --card-foreground: #2D2D2D;
-  --popover: #FFFFFF;
-  --popover-foreground: #2D2D2D;
-  --primary: #F5C518;
-  --primary-foreground: #2D2D2D;
-  --secondary: #F7F6F1;
-  --secondary-foreground: #2D2D2D;
-  --muted: #F0EFE9;
-  --muted-foreground: #6B7280;
-  --accent: #F0EFE9;
-  --accent-foreground: #2D2D2D;
+  /* shadcn compat */
+  --background: var(--bg);
+  --foreground: var(--navy);
+  --card: var(--surface);
+  --card-foreground: var(--navy);
+  --popover: var(--surface);
+  --popover-foreground: var(--navy);
+  --primary: var(--gold-light);
+  --primary-foreground: var(--navy);
+  --secondary: var(--gray-light);
+  --secondary-foreground: var(--navy);
+  --muted: var(--gray-light);
+  --muted-foreground: var(--gray);
+  --accent: var(--gray-light);
+  --accent-foreground: var(--navy);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: rgba(0, 0, 0, 0.08);
-  --input: rgba(0, 0, 0, 0.06);
-  --ring: #F5C518;
+  --border-tw: var(--border);
+  --input: var(--border-med);
+  --ring: var(--gold-light);
   --radius: 0.625rem;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #2D2D2D;
-  --sidebar-primary: #F5C518;
-  --sidebar-primary-foreground: #2D2D2D;
-  --sidebar-accent: #F7F6F1;
-  --sidebar-accent-foreground: #2D2D2D;
-  --sidebar-border: rgba(0, 0, 0, 0.08);
-  --sidebar-ring: #F5C518;
-  --chart-1: #F5C518;
-  --chart-2: #E0B115;
-  --chart-3: #6B7280;
-  --chart-4: #2D2D2D;
-  --chart-5: #F7F6F1;
+  --sidebar: var(--navy);
+  --sidebar-foreground: rgba(255,255,255,0.8);
+  --sidebar-primary: var(--gold-light);
+  --sidebar-primary-foreground: var(--navy);
+  --sidebar-accent: rgba(255,255,255,0.06);
+  --sidebar-accent-foreground: rgba(255,255,255,0.9);
+  --sidebar-border: rgba(255,255,255,0.07);
+  --sidebar-ring: var(--gold-light);
+  --chart-1: var(--gold-light);
+  --chart-2: var(--gold);
+  --chart-3: var(--gray);
+  --chart-4: var(--navy);
+  --chart-5: var(--bg);
 }
 
 @theme inline {
@@ -71,7 +87,7 @@
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
-  --color-border: var(--border);
+  --color-border: var(--border-tw);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -99,30 +115,34 @@
     @apply border-border outline-ring/50;
   }
   body {
-    background-color: #F7F6F1;
-    color: #2D2D2D;
+    background-color: var(--bg);
+    color: var(--navy);
     font-family: var(--font-barlow, sans-serif);
   }
   html {
-    background-color: #F7F6F1;
+    background-color: var(--bg);
   }
 }
 
-/* Input overrides for light cream theme */
+/* Global form inputs */
 input, textarea, select {
-  background-color: #FFFFFF !important;
-  color: #2D2D2D !important;
-  border-color: rgba(0, 0, 0, 0.12) !important;
+  background-color: var(--surface) !important;
+  color: var(--navy) !important;
+  border: 1.5px solid var(--border-med) !important;
+  border-radius: var(--r);
+  padding: 0.75rem 1rem;
+  font-size: 0.9375rem;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #F5C518 !important;
-  box-shadow: 0 0 0 2px rgba(245, 197, 24, 0.2);
+  border-color: var(--gold-light) !important;
+  box-shadow: 0 0 0 3px rgba(245,197,24,0.18);
 }
 
 input::placeholder, textarea::placeholder {
-  color: #9CA3AF !important;
+  color: var(--gray) !important;
+  opacity: 0.7;
 }
 
 /* Print Styles */

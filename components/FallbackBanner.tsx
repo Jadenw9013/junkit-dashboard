@@ -8,18 +8,19 @@ export default function FallbackBanner() {
   if (dismissed) return null
 
   return (
-    <div
-      className="flex items-start gap-2 px-3 py-2.5 rounded-xl mb-4"
-      style={{
-        backgroundColor: 'rgba(245,158,11,0.1)',
-        border: '1px solid rgba(245,158,11,0.3)',
-      }}
-    >
-      <AlertTriangle size={14} className="mt-0.5 shrink-0" style={{ color: '#fcd34d' }} />
-      <p className="text-xs flex-1" style={{ color: '#fcd34d' }}>
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 8,
+      backgroundColor: 'var(--amber-bg)',
+      border: '1px solid rgba(146,64,14,0.12)',
+      borderRadius: 'var(--r)',
+      padding: '0.75rem 1rem',
+      marginBottom: '0.875rem',
+    }}>
+      <AlertTriangle size={14} style={{ color: 'var(--amber)', flexShrink: 0, marginTop: 2 }} />
+      <p style={{ flex: 1, fontSize: '0.8125rem', color: 'var(--amber)', lineHeight: 1.5 }}>
         AI unavailable — showing template response. Edit before sending.
       </p>
-      <button onClick={() => setDismissed(true)} style={{ color: '#6B7280' }}>
+      <button onClick={() => setDismissed(true)} style={{ color: 'var(--gray)', background: 'none', border: 'none', cursor: 'pointer', padding: 2 }}>
         <X size={13} />
       </button>
     </div>

@@ -64,6 +64,7 @@ export async function POST(request: NextRequest) {
     city: city ?? '',
     notes: description ?? '',
     status: 'lead',
+    source: 'webhook',
   })
 
   if (phone) {
